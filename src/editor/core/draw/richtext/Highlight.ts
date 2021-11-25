@@ -3,24 +3,19 @@ import { Draw } from "../Draw"
 
 export class Highlight {
 
-  private draw: Draw
-  private ctx: CanvasRenderingContext2D
   private options: Required<IEditorOption>
 
   constructor(draw: Draw) {
-    this.draw = draw
-    this.ctx = draw.getCtx()
     this.options = draw.getOptions()
   }
 
-  public render(color: string, x: number, y: number, width: number, height: number) {
-    this.ctx = this.draw.getCtx()
+  public render(ctx: CanvasRenderingContext2D, color: string, x: number, y: number, width: number, height: number) {
     const { highlightAlpha } = this.options
-    this.ctx.save()
-    this.ctx.globalAlpha = highlightAlpha
-    this.ctx.fillStyle = color
-    this.ctx.fillRect(x, y, width, height)
-    this.ctx.restore()
+    ctx.save()
+    ctx.globalAlpha = highlightAlpha
+    ctx.fillStyle = color
+    ctx.fillRect(x, y, width, height)
+    ctx.restore()
   }
 
 }

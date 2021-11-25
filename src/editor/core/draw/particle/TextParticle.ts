@@ -3,7 +3,6 @@ import { Draw } from "../Draw"
 
 export class TextParticle {
 
-  private draw: Draw
   private ctx: CanvasRenderingContext2D
   private curX: number
   private curY: number
@@ -12,7 +11,6 @@ export class TextParticle {
   private curColor?: string
 
   constructor(draw: Draw) {
-    this.draw = draw
     this.ctx = draw.getCtx()
     this.curX = -1
     this.curY = -1
@@ -25,7 +23,8 @@ export class TextParticle {
     this.text = ''
   }
 
-  public record(element: IRowElement, x: number, y: number) {
+  public record(ctx: CanvasRenderingContext2D, element: IRowElement, x: number, y: number) {
+    this.ctx = ctx
     // 主动完成的重设起始点
     if (!this.text) {
       this._setCurXY(x, y)
@@ -50,7 +49,6 @@ export class TextParticle {
 
   private _render() {
     if (!this.text || !~this.curX || !~this.curX) return
-    this.ctx = this.draw.getCtx()
     this.ctx.save()
     this.ctx.font = this.curStyle
     if (this.curColor) {

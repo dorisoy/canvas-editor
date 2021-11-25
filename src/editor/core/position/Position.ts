@@ -41,8 +41,10 @@ export class Position {
 
   public getPositionByXY(x: number, y: number): ICurrentPosition {
     this.elementList = this.draw.getElementList()
+    const curPageNo = this.draw.getPageNo()
     for (let j = 0; j < this.positionList.length; j++) {
-      const { index, coordinate: { leftTop, rightTop, leftBottom } } = this.positionList[j];
+      const { index, pageNo, coordinate: { leftTop, rightTop, leftBottom } } = this.positionList[j]
+      if (curPageNo !== pageNo) continue
       // 命中元素
       if (leftTop[0] <= x && rightTop[0] >= x && leftTop[1] <= y && leftBottom[1] >= y) {
         let curPostionIndex = j
@@ -65,9 +67,10 @@ export class Position {
     let isLastArea = false
     let curPostionIndex = -1
     // 判断所属行是否存在元素
-    const firstLetterList = this.positionList.filter(p => p.isLastLetter)
+    const firstLetterList = this.positionList.filter(p => p.isLastLetter && p.pageNo === curPageNo)
     for (let j = 0; j < firstLetterList.length; j++) {
-      const { index, coordinate: { leftTop, leftBottom } } = firstLetterList[j]
+      const { index, pageNo, coordinate: { leftTop, leftBottom } } = firstLetterList[j]
+      if (curPageNo !== pageNo) continue
       if (y > leftTop[1] && y <= leftBottom[1]) {
         const isHead = x < this.options.margins[3]
         // 是否在头部

@@ -65,14 +65,14 @@ export class Draw {
     this.listener = listener
 
     this.pageContainer = this._createPageContainer()
-    this._createPage()
+    this._createPage(0)
     this._setDefaultRange()
 
     this.historyManager = new HistoryManager()
     this.position = new Position(this)
     this.range = new RangeManager(this)
     this.margin = new Margin(this)
-    this.background = new Background(this)
+    this.background = new Background()
     this.search = new Search(this)
     this.underline = new Underline(this)
     this.strikeout = new Strikeout(this)
@@ -105,8 +105,16 @@ export class Draw {
     return this.pageNo
   }
 
+  public setPageNo(payload: number) {
+    this.pageNo = payload
+  }
+
   public getPage(): HTMLCanvasElement {
     return this.pageList[this.pageNo]
+  }
+
+  public getPageList(): HTMLCanvasElement[] {
+    return this.pageList
   }
 
   public getCtx(): CanvasRenderingContext2D {
@@ -180,12 +188,12 @@ export class Draw {
     return pageContainer
   }
 
-  private _createPage() {
+  private _createPage(pageNo: number) {
     const canvas = document.createElement('canvas')
     canvas.style.width = `${this.options.width}px`
     canvas.style.height = `${this.options.height}px`
     canvas.style.marginBottom = `${this.options.pageGap}px`
-    canvas.setAttribute('data-index', String(this.pageNo))
+    canvas.setAttribute('data-index', String(pageNo))
     this.pageContainer.append(canvas)
     // 调整分辨率
     const dpr = window.devicePixelRatio
@@ -296,25 +304,27 @@ export class Draw {
     this.rowList = rowList
   }
 
-  private _drawElement(positionList: IElementPosition[], rowList: IRow[]) {
+  private _drawElement(positionList: IElementPosition[], rowList: IRow[], pageNo: number) {
     const { margins } = this.options
-    this.getCtx().clearRect(0, 0, this.getPage().width, this.getPage().height)
+    const canvas = this.pageList[pageNo]
+    const ctx = this.ctxList[pageNo]
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
     // 基础信息
-    const canvasRect = this.getPage().getBoundingClientRect()
+    const canvasRect = canvas.getBoundingClientRect()
     // 绘制背景
-    this.background.render(canvasRect)
+    this.background.render(ctx, canvasRect)
     // 绘制页边距
     const leftTopPoint: [number, number] = [margins[3], margins[0]]
-    this.margin.render(canvasRect)
+    this.margin.render(ctx, canvasRect)
     // 渲染元素
     let x = leftTopPoint[0]
     let y = leftTopPoint[1]
-    let index = 0
+    let index = positionList.length
     for (let i = 0; i < rowList.length; i++) {
       const curRow = rowList[i]
       // 计算行偏移量（行居左、居中、居右）
       if (curRow.rowFlex && curRow.rowFlex !== RowFlex.LEFT) {
-        const canvasInnerWidth = this.getPage().width - margins[1] - margins[3]
+        const canvasInnerWidth = canvas.width - margins[1] - margins[3]
         if (curRow.rowFlex === RowFlex.CENTER) {
           x += (canvasInnerWidth - curRow.width) / 2
         } else {
@@ -328,6 +338,7 @@ export class Draw {
           ? curRow.ascent - element.height!
           : curRow.ascent
         const positionItem: IElementPosition = {
+          pageNo,
           index,
           value: element.value,
           rowNo: i,
@@ -345,27 +356,27 @@ export class Draw {
         positionList.push(positionItem)
         // 下划线绘制
         if (element.underline) {
-          this.underline.render(x, y + curRow.height, metrics.width)
+          this.underline.render(ctx, x, y + curRow.height, metrics.width)
         }
         // 删除线绘制
         if (element.strikeout) {
-          this.strikeout.render(x, y + curRow.height / 2, metrics.width)
+          this.strikeout.render(ctx, x, y + curRow.height / 2, metrics.width)
         }
         // 元素高亮
         if (element.highlight) {
-          this.highlight.render(element.highlight, x, y, metrics.width, curRow.height)
+          this.highlight.render(ctx, element.highlight, x, y, metrics.width, curRow.height)
         }
         // 元素绘制
         if (element.type === ElementType.IMAGE) {
           this.textParticle.complete()
-          this.imageParticle.render(element, x, y + offsetY)
+          this.imageParticle.render(ctx, element, x, y + offsetY)
         } else {
-          this.textParticle.record(element, x, y + offsetY)
+          this.textParticle.record(ctx, element, x, y + offsetY)
         }
         // 选区绘制
         const { startIndex, endIndex } = this.range.getRange()
         if (startIndex !== endIndex && startIndex < index && index <= endIndex) {
-          this.range.render(x, y, metrics.width, curRow.height)
+          this.range.render(ctx, x, y, metrics.width, curRow.height)
         }
         index++
         x += metrics.width
@@ -376,7 +387,7 @@ export class Draw {
     }
     // 搜索匹配绘制
     if (this.searchMatchList) {
-      this.search.render()
+      this.search.render(ctx)
     }
   }
 
@@ -414,12 +425,11 @@ export class Draw {
     }
     // 绘制元素
     for (let i = 0; i < pageRowList.length; i++) {
-      this.pageNo = i
       if (!this.pageList[i]) {
-        this._createPage()
+        this._createPage(i)
       }
       const rowList = pageRowList[i]
-      this._drawElement(positionList, rowList)
+      this._drawElement(positionList, rowList, i)
     }
     // 光标重绘
     if (curIndex === undefined) {

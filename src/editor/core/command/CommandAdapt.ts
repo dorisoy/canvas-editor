@@ -168,6 +168,7 @@ export class CommandAdapt {
   public rowFlex(payload: RowFlex) {
     const { startIndex, endIndex } = this.range.getRange()
     if (startIndex === 0 && endIndex === 0) return
+    const pageNo = this.draw.getPageNo()
     const positionList = this.position.getPositionList()
     // 开始/结束行号
     const startRowNo = positionList[startIndex].rowNo
@@ -176,6 +177,7 @@ export class CommandAdapt {
     // 当前选区所在行
     for (let p = 0; p < positionList.length; p++) {
       const postion = positionList[p]
+      if (postion.pageNo !== pageNo) continue
       if (postion.rowNo > endRowNo) break
       if (postion.rowNo >= startRowNo && postion.rowNo <= endRowNo) {
         elementList[p].rowFlex = payload
@@ -190,6 +192,7 @@ export class CommandAdapt {
   public rowMargin(payload: number) {
     const { startIndex, endIndex } = this.range.getRange()
     if (startIndex === 0 && endIndex === 0) return
+    const pageNo = this.draw.getPageNo()
     const positionList = this.position.getPositionList()
     // 开始/结束行号
     const startRowNo = positionList[startIndex].rowNo
@@ -198,6 +201,7 @@ export class CommandAdapt {
     // 当前选区所在行
     for (let p = 0; p < positionList.length; p++) {
       const postion = positionList[p]
+      if (postion.pageNo !== pageNo) continue
       if (postion.rowNo > endRowNo) break
       if (postion.rowNo >= startRowNo && postion.rowNo <= endRowNo) {
         elementList[p].rowMargin = payload

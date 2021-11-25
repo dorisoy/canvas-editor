@@ -7,7 +7,6 @@ import { Listener } from "../listener/Listener"
 
 export class RangeManager {
 
-  private ctx: CanvasRenderingContext2D
   private options: Required<IEditorOption>
   private range: IRange
   private draw: Draw
@@ -15,7 +14,6 @@ export class RangeManager {
   private historyManager: HistoryManager
 
   constructor(draw: Draw) {
-    this.ctx = draw.getCtx()
     this.options = draw.getOptions()
     this.draw = draw
     this.listener = draw.getListener()
@@ -104,13 +102,12 @@ export class RangeManager {
     })
   }
 
-  public render(x: number, y: number, width: number, height: number) {
-    this.ctx = this.draw.getCtx()
-    this.ctx.save()
-    this.ctx.globalAlpha = this.options.rangeAlpha
-    this.ctx.fillStyle = this.options.rangeColor
-    this.ctx.fillRect(x, y, width, height)
-    this.ctx.restore()
+  public render(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number) {
+    ctx.save()
+    ctx.globalAlpha = this.options.rangeAlpha
+    ctx.fillStyle = this.options.rangeColor
+    ctx.fillRect(x, y, width, height)
+    ctx.restore()
   }
 
 }
