@@ -1,9 +1,11 @@
+import { Draw } from "../Draw"
+
 export class Background {
 
   private ctx: CanvasRenderingContext2D
 
-  constructor(ctx: CanvasRenderingContext2D) {
-    this.ctx = ctx
+  constructor(draw: Draw) {
+    this.ctx = draw.getCtx()
   }
 
   public render(canvasRect: DOMRect) {

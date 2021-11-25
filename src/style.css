@@ -298,10 +298,17 @@ ul {
 }
 
 .editor {
-  width: 794px;
-  height: 1123px;
   margin: 80px auto;
   position: relative;
+}
+
+.page-container {
+  width: 100%;
+}
+
+.page-container canvas {
+  margin: 20px auto;
+  display: block;
   background-color: #ffffff;
   box-shadow: rgb(158 161 165 / 40%) 0px 2px 12px 0px;
 }

@@ -24,12 +24,12 @@ export class CanvasEvent {
   private historyManager: HistoryManager
   private imageParticle: ImageParticle
 
-  constructor(canvas: HTMLCanvasElement, draw: Draw) {
+  constructor(draw: Draw) {
     this.isAllowDrag = false
     this.isCompositing = false
     this.mouseDownStartIndex = 0
 
-    this.canvas = canvas
+    this.canvas = draw.getPage()
     this.draw = draw
     this.cursor = null
     this.position = this.draw.getPosition()

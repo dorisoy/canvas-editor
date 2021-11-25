@@ -5,19 +5,19 @@ import { CursorAgent } from "./CursorAgent"
 
 export class Cursor {
 
-  private canvas: HTMLCanvasElement
+  private container: HTMLDivElement
   private draw: Draw
   private cursorDom: HTMLDivElement
   private cursorAgent: CursorAgent
 
-  constructor(canvas: HTMLCanvasElement, draw: Draw, canvasEvent: CanvasEvent) {
-    this.canvas = canvas
+  constructor(draw: Draw, canvasEvent: CanvasEvent) {
+    this.container = draw.getContainer()
     this.draw = draw
 
     this.cursorDom = document.createElement('div')
     this.cursorDom.classList.add('cursor')
-    this.canvas.parentNode?.append(this.cursorDom)
-    this.cursorAgent = new CursorAgent(canvas, canvasEvent)
+    this.container.append(this.cursorDom)
+    this.cursorAgent = new CursorAgent(draw, canvasEvent)
   }
 
   public getCursorDom(): HTMLDivElement {

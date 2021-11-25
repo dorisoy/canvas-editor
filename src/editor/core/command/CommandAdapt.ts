@@ -253,7 +253,7 @@ export class CommandAdapt {
   }
 
   public print() {
-    return printImageBase64(this.draw.getDataURL())
+    return printImageBase64(this.draw.getDataURL()[0])
   }
 
 }

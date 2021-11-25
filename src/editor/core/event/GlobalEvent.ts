@@ -15,8 +15,8 @@ export class GlobalEvent {
   private range: RangeManager
   private imageParticle: ImageParticle
 
-  constructor(canvas: HTMLCanvasElement, draw: Draw, canvasEvent: CanvasEvent) {
-    this.canvas = canvas
+  constructor(draw: Draw, canvasEvent: CanvasEvent) {
+    this.canvas = draw.getPage()
     this.draw = draw
     this.canvasEvent = canvasEvent
     this.cursor = null

@@ -14,12 +14,12 @@ export class Position {
   private draw: Draw
   private options: Required<IEditorOption>
 
-  constructor(options: Required<IEditorOption>, draw: Draw) {
+  constructor(draw: Draw) {
     this.positionList = []
     this.elementList = []
     this.cursorPosition = null
 
-    this.options = options
+    this.options = draw.getOptions()
     this.draw = draw
   }
 

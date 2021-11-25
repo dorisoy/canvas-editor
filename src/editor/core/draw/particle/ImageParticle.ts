@@ -5,6 +5,7 @@ import { Draw } from "../Draw"
 
 export class ImageParticle {
 
+  private container: HTMLDivElement
   private canvas: HTMLCanvasElement
   private ctx: CanvasRenderingContext2D
   private draw: Draw
@@ -22,11 +23,12 @@ export class ImageParticle {
   private mousedownY: number
   private curHandleIndex: number
 
-  constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, options: Required<IEditorOption>, draw: Draw) {
-    this.canvas = canvas
-    this.ctx = ctx
+  constructor(draw: Draw) {
+    this.container = draw.getContainer()
+    this.canvas = draw.getPage()
+    this.ctx = draw.getCtx()
     this.draw = draw
-    this.options = options
+    this.options = draw.getOptions()
     this.curElement = null
     this.curPosition = null
     this.imageCache = new Map()
@@ -58,14 +60,14 @@ export class ImageParticle {
       resizerSelection.append(handleDom)
       resizerHandleList.push(handleDom)
     }
-    this.canvas.parentNode!.append(resizerSelection)
+    this.container.append(resizerSelection)
     // 拖拽镜像
     const resizerImageContainer = document.createElement('div')
     resizerImageContainer.classList.add('resizer-image')
     resizerImageContainer.style.display = 'none'
     const resizerImage = document.createElement('img')
     resizerImageContainer.append(resizerImage)
-    this.canvas.parentNode!.append(resizerImageContainer)
+    this.container.append(resizerImageContainer)
     return { resizerSelection, resizerHandleList, resizerImageContainer, resizerImage }
   }
 

@@ -1,13 +1,14 @@
 import { IEditorOption } from "../../../interface/Editor"
+import { Draw } from "../Draw"
 
 export class Margin {
 
   private ctx: CanvasRenderingContext2D
   private options: Required<IEditorOption>
 
-  constructor(ctx: CanvasRenderingContext2D, options: Required<IEditorOption>) {
-    this.ctx = ctx
-    this.options = options
+  constructor(draw: Draw) {
+    this.ctx = draw.getCtx()
+    this.options = draw.getOptions()
   }
 
   public render(canvasRect: DOMRect) {

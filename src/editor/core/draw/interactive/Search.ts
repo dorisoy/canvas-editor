@@ -9,15 +9,15 @@ export class Search {
   private draw: Draw
   private position: Position
 
-  constructor(ctx: CanvasRenderingContext2D, options: Required<IEditorOption>, draw: Draw) {
-    this.ctx = ctx
-    this.options = options
+  constructor(draw: Draw) {
+    this.ctx = draw.getCtx()
+    this.options = draw.getOptions()
     this.draw = draw
     this.position = draw.getPosition()
   }
 
   public render() {
-    const searchMatch = this.draw.getSearchMathch()
+    const searchMatch = this.draw.getSearchMatch()
     if (!searchMatch || !searchMatch.length) return
     const searchMatchList = searchMatch.flat()
     const positionList = this.position.getPositionList()

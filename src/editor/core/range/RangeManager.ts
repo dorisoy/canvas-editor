@@ -14,9 +14,9 @@ export class RangeManager {
   private listener: Listener
   private historyManager: HistoryManager
 
-  constructor(ctx: CanvasRenderingContext2D, options: Required<IEditorOption>, draw: Draw) {
-    this.ctx = ctx
-    this.options = options
+  constructor(draw: Draw) {
+    this.ctx = draw.getCtx()
+    this.options = draw.getOptions()
     this.draw = draw
     this.listener = draw.getListener()
     this.historyManager = draw.getHistoryManager()
