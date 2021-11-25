@@ -17,6 +17,7 @@ export class Search {
   }
 
   public render() {
+    this.ctx = this.draw.getCtx()
     const searchMatch = this.draw.getSearchMatch()
     if (!searchMatch || !searchMatch.length) return
     const searchMatchList = searchMatch.flat()

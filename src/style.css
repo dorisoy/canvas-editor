@@ -307,7 +307,6 @@ ul {
 }
 
 .page-container canvas {
-  margin: 20px auto;
   display: block;
   background-color: #ffffff;
   box-shadow: rgb(158 161 165 / 40%) 0px 2px 12px 0px;

@@ -1,4 +1,5 @@
 import { CURSOR_AGENT_HEIGHT } from "../../dataset/constant/Cursor"
+import { IEditorOption } from "../../interface/Editor"
 import { Draw } from "../draw/Draw"
 import { CanvasEvent } from "../event/CanvasEvent"
 import { CursorAgent } from "./CursorAgent"
@@ -7,12 +8,14 @@ export class Cursor {
 
   private container: HTMLDivElement
   private draw: Draw
+  private options: Required<IEditorOption>
   private cursorDom: HTMLDivElement
   private cursorAgent: CursorAgent
 
   constructor(draw: Draw, canvasEvent: CanvasEvent) {
     this.container = draw.getContainer()
     this.draw = draw
+    this.options = draw.getOptions()
 
     this.cursorDom = document.createElement('div')
     this.cursorDom.classList.add('cursor')
@@ -33,6 +36,8 @@ export class Cursor {
     if (!cursorPosition) return
     // 设置光标代理
     const { metrics, coordinate: { leftTop, rightTop }, ascent } = cursorPosition
+    const { height, pageGap } = this.options
+    const prePageHeight = this.draw.getPageNo() * (height + pageGap)
     // 增加1/4字体大小
     const offsetHeight = metrics.height / 4
     const cursorHeight = metrics.height + offsetHeight * 2
@@ -43,7 +48,7 @@ export class Cursor {
     })
     // fillText位置 + 文字基线到底部距离 - 模拟光标偏移量
     const descent = metrics.boundingBoxDescent < 0 ? 0 : metrics.boundingBoxDescent
-    const cursorTop = (leftTop[1] + ascent) + descent - (cursorHeight - offsetHeight)
+    const cursorTop = (leftTop[1] + ascent) + descent - (cursorHeight - offsetHeight) + prePageHeight
     const curosrleft = rightTop[0]
     agentCursorDom.style.left = `${curosrleft}px`
     agentCursorDom.style.top = `${cursorTop + cursorHeight - CURSOR_AGENT_HEIGHT}px`

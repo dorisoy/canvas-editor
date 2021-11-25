@@ -24,6 +24,7 @@ export default class Editor {
       defaultBasicRowMarginHeight: 8,
       width: 794,
       height: 1123,
+      pageGap: 20,
       underlineColor: '#000000',
       strikeoutColor: '#FF0000',
       rangeAlpha: 0.6,

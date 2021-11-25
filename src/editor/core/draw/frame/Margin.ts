@@ -3,15 +3,18 @@ import { Draw } from "../Draw"
 
 export class Margin {
 
+  private draw: Draw
   private ctx: CanvasRenderingContext2D
   private options: Required<IEditorOption>
 
   constructor(draw: Draw) {
+    this.draw = draw
     this.ctx = draw.getCtx()
     this.options = draw.getOptions()
   }
 
   public render(canvasRect: DOMRect) {
+    this.ctx = this.draw.getCtx()
     const { width, height } = canvasRect
     const { marginIndicatorColor, marginIndicatorSize, margins } = this.options
     this.ctx.save()

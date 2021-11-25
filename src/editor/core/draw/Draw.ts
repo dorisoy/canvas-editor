@@ -184,6 +184,8 @@ export class Draw {
     const canvas = document.createElement('canvas')
     canvas.style.width = `${this.options.width}px`
     canvas.style.height = `${this.options.height}px`
+    canvas.style.marginBottom = `${this.options.pageGap}px`
+    canvas.setAttribute('data-index', String(this.pageNo))
     this.pageContainer.append(canvas)
     // 调整分辨率
     const dpr = window.devicePixelRatio
@@ -294,23 +296,9 @@ export class Draw {
     this.rowList = rowList
   }
 
-  public render(payload?: IDrawOption) {
-    let {
-      curIndex,
-      isSubmitHistory = true,
-      isSetCursor = true,
-      isComputeRowList = true
-    } = payload || {}
-    // 计算行信息
+  private _drawElement(positionList: IElementPosition[], rowList: IRow[]) {
     const { margins } = this.options
-    if (isComputeRowList) {
-      this._computeRowList()
-    }
-    // 清除光标等副作用
-    this.cursor.recoveryCursor()
     this.getCtx().clearRect(0, 0, this.getPage().width, this.getPage().height)
-    this.position.setPositionList([])
-    const positionList = this.position.getPositionList()
     // 基础信息
     const canvasRect = this.getPage().getBoundingClientRect()
     // 绘制背景
@@ -322,8 +310,8 @@ export class Draw {
     let x = leftTopPoint[0]
     let y = leftTopPoint[1]
     let index = 0
-    for (let i = 0; i < this.rowList.length; i++) {
-      const curRow = this.rowList[i]
+    for (let i = 0; i < rowList.length; i++) {
+      const curRow = rowList[i]
       // 计算行偏移量（行居左、居中、居右）
       if (curRow.rowFlex && curRow.rowFlex !== RowFlex.LEFT) {
         const canvasInnerWidth = this.getPage().width - margins[1] - margins[3]
@@ -389,6 +377,49 @@ export class Draw {
     // 搜索匹配绘制
     if (this.searchMatchList) {
       this.search.render()
+    }
+  }
+
+  public render(payload?: IDrawOption) {
+    let {
+      curIndex,
+      isSubmitHistory = true,
+      isSetCursor = true,
+      isComputeRowList = true
+    } = payload || {}
+    // 计算行信息
+    if (isComputeRowList) {
+      this._computeRowList()
+    }
+    // 清除光标等副作用
+    this.cursor.recoveryCursor()
+    this.position.setPositionList([])
+    const positionList = this.position.getPositionList()
+    // 按页渲染
+    const { margins } = this.options
+    const marginHeight = margins[0] + margins[2]
+    let pageHeight = marginHeight
+    let pageNo = 0
+    let pageRowList: IRow[][] = [[]]
+    for (let i = 0; i < this.rowList.length; i++) {
+      const row = this.rowList[i]
+      if (row.height + pageHeight > this.options.height) {
+        pageHeight = marginHeight
+        pageRowList.push([row])
+        pageNo++
+      } else {
+        pageHeight += row.height
+        pageRowList[pageNo].push(row)
+      }
+    }
+    // 绘制元素
+    for (let i = 0; i < pageRowList.length; i++) {
+      this.pageNo = i
+      if (!this.pageList[i]) {
+        this._createPage()
+      }
+      const rowList = pageRowList[i]
+      this._drawElement(positionList, rowList)
     }
     // 光标重绘
     if (curIndex === undefined) {

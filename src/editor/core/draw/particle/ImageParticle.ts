@@ -72,7 +72,9 @@ export class ImageParticle {
   }
 
   private _handleMousedown(evt: MouseEvent) {
+    this.canvas = this.draw.getPage()
     if (!this.curPosition || !this.curElement) return
+    const { height, pageGap } = this.options
     this.mousedownX = evt.x
     this.mousedownY = evt.y
     const target = evt.target as HTMLDivElement
@@ -85,8 +87,9 @@ export class ImageParticle {
     this.resizerImage.src = this.curElement?.value!
     this.resizerImageContainer.style.display = 'block'
     const { coordinate: { leftTop: [left, top] } } = this.curPosition
+    const prePageHeight = this.draw.getPageNo() * (height + pageGap)
     this.resizerImageContainer.style.left = `${left}px`
-    this.resizerImageContainer.style.top = `${top}px`
+    this.resizerImageContainer.style.top = `${top + prePageHeight}px`
     this.resizerImage.style.width = `${this.curElement.width}px`
     this.resizerImage.style.height = `${this.curElement.height}px`
     // 追加全局事件
@@ -193,6 +196,7 @@ export class ImageParticle {
   }
 
   public render(element: IElement, x: number, y: number) {
+    this.ctx = this.draw.getCtx()
     const width = element.width!
     const height = element.height!
     if (this.imageCache.has(element.id!)) {

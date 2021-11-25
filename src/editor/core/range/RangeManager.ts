@@ -105,6 +105,7 @@ export class RangeManager {
   }
 
   public render(x: number, y: number, width: number, height: number) {
+    this.ctx = this.draw.getCtx()
     this.ctx.save()
     this.ctx.globalAlpha = this.options.rangeAlpha
     this.ctx.fillStyle = this.options.rangeColor
