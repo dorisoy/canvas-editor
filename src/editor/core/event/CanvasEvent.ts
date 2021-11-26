@@ -157,6 +157,15 @@ export class CanvasEvent {
       const curIndex = isCollspace ? index - 1 : startIndex
       this.range.setRange(curIndex, curIndex)
       this.draw.render({ curIndex })
+    } else if (evt.key === KeyMap.Delete) {
+      if (!isCollspace) {
+        elementList.splice(startIndex + 1, endIndex - startIndex)
+      } else {
+        elementList.splice(index + 1, 1)
+      }
+      const curIndex = isCollspace ? index : startIndex
+      this.range.setRange(curIndex, curIndex)
+      this.draw.render({ curIndex })
     } else if (evt.key === KeyMap.Enter) {
       const enterText: IElement = {
         value: ZERO
