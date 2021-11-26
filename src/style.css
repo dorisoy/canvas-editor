@@ -249,6 +249,8 @@ ul {
 }
 
 .menu-item .menu-item__search__collapse {
+  width: 215px;
+  height: 36px;
   box-sizing: border-box;
   position: absolute;
   display: none;

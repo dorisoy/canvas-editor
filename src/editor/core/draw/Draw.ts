@@ -387,7 +387,7 @@ export class Draw {
     }
     // 搜索匹配绘制
     if (this.searchMatchList) {
-      this.search.render(ctx)
+      this.search.render(ctx, pageNo)
     }
   }
 

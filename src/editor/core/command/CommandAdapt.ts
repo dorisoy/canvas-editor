@@ -257,7 +257,8 @@ export class CommandAdapt {
   }
 
   public print() {
-    return printImageBase64(this.draw.getDataURL()[0])
+    const { width, height } = this.options
+    return printImageBase64(this.draw.getDataURL(), width, height)
   }
 
 }

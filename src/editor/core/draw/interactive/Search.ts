@@ -14,7 +14,7 @@ export class Search {
     this.position = draw.getPosition()
   }
 
-  public render(ctx: CanvasRenderingContext2D) {
+  public render(ctx: CanvasRenderingContext2D, pageIndex: number) {
     const searchMatch = this.draw.getSearchMatch()
     if (!searchMatch || !searchMatch.length) return
     const searchMatchList = searchMatch.flat()
@@ -24,7 +24,9 @@ export class Search {
     ctx.fillStyle = this.options.searchMatchColor
     searchMatchList.forEach(s => {
       const position = positionList[s]
-      const { leftTop, leftBottom, rightTop } = position.coordinate
+      if (!position) return
+      const { coordinate: { leftTop, leftBottom, rightTop }, pageNo } = position
+      if (pageNo !== pageIndex) return
       const x = leftTop[0]
       const y = leftTop[1]
       const width = rightTop[0] - leftTop[0]
