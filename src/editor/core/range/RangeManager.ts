@@ -7,15 +7,15 @@ import { Listener } from "../listener/Listener"
 
 export class RangeManager {
 
+  private draw: Draw
   private options: Required<IEditorOption>
   private range: IRange
-  private draw: Draw
   private listener: Listener
   private historyManager: HistoryManager
 
   constructor(draw: Draw) {
-    this.options = draw.getOptions()
     this.draw = draw
+    this.options = draw.getOptions()
     this.listener = draw.getListener()
     this.historyManager = draw.getHistoryManager()
     this.range = {

@@ -4,13 +4,13 @@ import { Draw } from "../Draw"
 
 export class Search {
 
-  private options: Required<IEditorOption>
   private draw: Draw
+  private options: Required<IEditorOption>
   private position: Position
 
   constructor(draw: Draw) {
-    this.options = draw.getOptions()
     this.draw = draw
+    this.options = draw.getOptions()
     this.position = draw.getPosition()
   }
 

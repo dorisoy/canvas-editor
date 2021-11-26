@@ -1,4 +1,5 @@
 import { ZERO } from "../../dataset/constant/Common"
+import { EDITOR_ELEMENT_STYLE } from "../../dataset/constant/Element"
 import { ElementType } from "../../dataset/enum/Element"
 import { ElementStyleKey } from "../../dataset/enum/ElementStyle"
 import { RowFlex } from "../../dataset/enum/Row"
@@ -41,7 +42,7 @@ export class CommandAdapt {
     if (!selection) return
     const painterStyle: IElementStyle = {}
     selection.forEach(s => {
-      const painterStyleKeys = ['bold', 'color', 'highlight', 'font', 'size', 'italic', 'underline', 'strikeout']
+      const painterStyleKeys = EDITOR_ELEMENT_STYLE
       painterStyleKeys.forEach(p => {
         const key = p as keyof typeof ElementStyleKey
         if (painterStyle[key] === undefined) {

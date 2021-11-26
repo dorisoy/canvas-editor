@@ -66,7 +66,6 @@ export class Draw {
 
     this.pageContainer = this._createPageContainer()
     this._createPage(0)
-    this._setDefaultRange()
 
     this.historyManager = new HistoryManager()
     this.position = new Position(this)
@@ -90,7 +89,7 @@ export class Draw {
     this.painterStyle = null
     this.searchMatchList = null
 
-    this.render()
+    this.render({ isSetCursor: false })
   }
 
   public getContainer(): HTMLDivElement {
@@ -180,7 +179,17 @@ export class Draw {
     this.searchMatchList = payload
   }
 
+  public setDefaultRange() {
+    if (!this.elementList.length) return
+    setTimeout(() => {
+      const curIndex = this.elementList.length - 1
+      this.range.setRange(curIndex, curIndex)
+      this.range.setRangeStyle()
+    })
+  }
+
   private _createPageContainer(): HTMLDivElement {
+    // 容器宽度需跟随纸张宽度
     this.container.style.width = `${this.options.width}px`
     const pageContainer = document.createElement('div')
     pageContainer.classList.add('page-container')
@@ -205,15 +214,6 @@ export class Draw {
     // 缓存上下文
     this.pageList.push(canvas)
     this.ctxList.push(ctx)
-  }
-
-  private _setDefaultRange() {
-    if (!this.elementList.length) return
-    setTimeout(() => {
-      const curIndex = this.elementList.length - 1
-      this.range.setRange(curIndex, curIndex)
-      this.range.setRangeStyle()
-    })
   }
 
   private _getFont(el: IElement): string {
@@ -429,7 +429,7 @@ export class Draw {
       const rowList = pageRowList[i]
       this._drawElement(positionList, rowList, i)
     }
-    // 移除多余page
+    // 移除多余页
     setTimeout(() => {
       const curPageCount = pageRowList.length
       const prePageCount = this.pageList.length
@@ -441,10 +441,10 @@ export class Draw {
       }
     })
     // 光标重绘
-    if (curIndex === undefined) {
-      curIndex = positionList.length - 1
-    }
     if (isSetCursor) {
+      if (curIndex === undefined) {
+        curIndex = positionList.length - 1
+      }
       this.position.setCursorPosition(positionList[curIndex!] || null)
       this.cursor.drawCursor()
     }

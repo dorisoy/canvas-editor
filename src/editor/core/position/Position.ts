@@ -19,8 +19,8 @@ export class Position {
     this.elementList = []
     this.cursorPosition = null
 
-    this.options = draw.getOptions()
     this.draw = draw
+    this.options = draw.getOptions()
   }
 
   public getPositionList(): IElementPosition[] {

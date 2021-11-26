@@ -8,16 +8,16 @@ import { CanvasEvent } from "./CanvasEvent"
 
 export class GlobalEvent {
 
-  private canvas: HTMLCanvasElement
   private draw: Draw
+  private canvas: HTMLCanvasElement
   private cursor: Cursor | null
   private canvasEvent: CanvasEvent
   private range: RangeManager
   private imageParticle: ImageParticle
 
   constructor(draw: Draw, canvasEvent: CanvasEvent) {
-    this.canvas = draw.getPage()
     this.draw = draw
+    this.canvas = draw.getPage()
     this.canvasEvent = canvasEvent
     this.cursor = null
     this.range = draw.getRange()
