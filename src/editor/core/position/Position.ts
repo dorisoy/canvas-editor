@@ -85,7 +85,8 @@ export class Position {
       }
     }
     if (!isLastArea) {
-      return { index: this.positionList.length - 1 }
+      // 当前页最后一行
+      return { index: firstLetterList[firstLetterList.length - 1]?.index || this.positionList.length - 1 }
     }
     return { index: curPostionIndex }
   }

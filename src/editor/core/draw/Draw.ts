@@ -222,9 +222,9 @@ export class Draw {
   }
 
   private _computeRowList() {
-    const { defaultSize } = this.options
-    const canvasRect = this.getPage().getBoundingClientRect()
-    const { width } = canvasRect
+    const { defaultSize, width } = this.options
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
     const { margins, defaultRowMargin, defaultBasicRowMarginHeight } = this.options
     const leftTopPoint: [number, number] = [margins[3], margins[0]]
     const rightTopPoint: [number, number] = [width - margins[1], margins[0]]
@@ -239,7 +239,6 @@ export class Draw {
         rowFlex: this.elementList?.[1]?.rowFlex
       })
     }
-    this.getCtx().save()
     for (let i = 0; i < this.elementList.length; i++) {
       const curRow: IRow = rowList[rowList.length - 1]
       const element = this.elementList[i]
@@ -264,8 +263,8 @@ export class Draw {
         metrics.boundingBoxDescent = element.height!
       } else {
         metrics.height = element.size || this.options.defaultSize
-        this.getCtx().font = this._getFont(element)
-        const fontMetrics = this.getCtx().measureText(element.value)
+        ctx.font = this._getFont(element)
+        const fontMetrics = ctx.measureText(element.value)
         metrics.width = fontMetrics.width
         metrics.boundingBoxAscent = element.value === ZERO ? defaultSize : fontMetrics.actualBoundingBoxAscent
         metrics.boundingBoxDescent = fontMetrics.actualBoundingBoxDescent
@@ -276,7 +275,7 @@ export class Draw {
       const rowElement: IRowElement = {
         ...element,
         metrics,
-        style: this.getCtx().font
+        style: ctx.font
       }
       // 超过限定宽度
       if (curRow.width + metrics.width > innerWidth || (i !== 0 && element.value === ZERO)) {
@@ -300,7 +299,6 @@ export class Draw {
         curRow.elementList.push(rowElement)
       }
     }
-    this.getCtx().restore()
     this.rowList = rowList
   }
 
@@ -415,7 +413,7 @@ export class Draw {
     for (let i = 0; i < this.rowList.length; i++) {
       const row = this.rowList[i]
       if (row.height + pageHeight > this.options.height) {
-        pageHeight = marginHeight
+        pageHeight = marginHeight + row.height
         pageRowList.push([row])
         pageNo++
       } else {
@@ -431,6 +429,17 @@ export class Draw {
       const rowList = pageRowList[i]
       this._drawElement(positionList, rowList, i)
     }
+    // 移除多余page
+    setTimeout(() => {
+      const curPageCount = pageRowList.length
+      const prePageCount = this.pageList.length
+      if (prePageCount > curPageCount) {
+        const deleteCount = prePageCount - curPageCount
+        this.ctxList.splice(curPageCount, deleteCount)
+        this.pageList.splice(curPageCount, deleteCount)
+          .forEach(page => page.remove())
+      }
+    })
     // 光标重绘
     if (curIndex === undefined) {
       curIndex = positionList.length - 1
@@ -444,7 +453,9 @@ export class Draw {
       const self = this
       const oldElementList = deepClone(this.elementList)
       const { startIndex, endIndex } = this.range.getRange()
+      const pageNo = this.pageNo
       this.historyManager.execute(function () {
+        self.setPageNo(pageNo)
         self.range.setRange(startIndex, endIndex)
         self.elementList = deepClone(oldElementList)
         self.render({ curIndex, isSubmitHistory: false })
