@@ -69,6 +69,40 @@ window.onload = function () {
     id: 'signature',
     type: ElementType.IMAGE
   })
+  data.push({
+    type: ElementType.TABLE,
+    width: 500,
+    height: 300,
+    value: `\n`,
+    colgroup: [{
+      width: 250
+    }, {
+      width: 250
+    }],
+    trList: [{
+      height: 150,
+      tdList: [{
+        colspan: 1,
+        rowspan: 1,
+        value: [{ value: `\n` }]
+      }, {
+        colspan: 1,
+        rowspan: 1,
+        value: [{ value: `\n` }]
+      }]
+    }, {
+      height: 150,
+      tdList: [{
+        colspan: 1,
+        rowspan: 1,
+        value: [{ value: `\n` }]
+      }, {
+        colspan: 1,
+        rowspan: 1,
+        value: [{ value: `\n` }]
+      }]
+    }]
+  })
   // 初始化编辑器
   const container = document.querySelector<HTMLDivElement>('.editor')!
   const instance = new Editor(container, data, {

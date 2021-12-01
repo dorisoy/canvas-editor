@@ -1,11 +1,12 @@
 import { ElementType } from "../dataset/enum/Element"
 import { RowFlex } from "../dataset/enum/Row"
+import { IColgroup } from "./table/Colgroup"
+import { ITr } from "./table/Tr"
 
-export interface IElementMetrics {
-  width: number;
-  height: number;
-  boundingBoxAscent: number;
-  boundingBoxDescent: number;
+export interface IElementBasic {
+  id?: string;
+  type?: ElementType;
+  value: string;
 }
 
 export interface IElementStyle {
@@ -23,13 +24,19 @@ export interface IElementStyle {
   rowMargin?: number;
 }
 
-export interface IElementBasic {
-  id?: string;
-  type?: ElementType;
-  value: string;
+export interface ITable {
+  colgroup?: IColgroup[];
+  trList?: ITr[];
 }
 
-export type IElement = IElementBasic & IElementStyle
+export type IElement = IElementBasic & IElementStyle & ITable
+
+export interface IElementMetrics {
+  width: number;
+  height: number;
+  boundingBoxAscent: number;
+  boundingBoxDescent: number;
+}
 
 export interface IElementPosition {
   pageNo: number;
