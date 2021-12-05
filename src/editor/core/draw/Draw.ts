@@ -23,6 +23,7 @@ import { ImageParticle } from "./particle/ImageParticle"
 import { TextParticle } from "./particle/TextParticle"
 import { PageNumber } from "./frame/PageNumber"
 import { GlobalObserver } from "../observer/GlobalObserver"
+import { TableParticle } from "./particle/table/TableParticle"
 
 export class Draw {
 
@@ -47,6 +48,7 @@ export class Draw {
   private historyManager: HistoryManager
   private imageParticle: ImageParticle
   private textParticle: TextParticle
+  private tableParticle: TableParticle
   private pageNumber: PageNumber
 
   private rowList: IRow[]
@@ -83,6 +85,7 @@ export class Draw {
     this.highlight = new Highlight(this)
     this.imageParticle = new ImageParticle(this)
     this.textParticle = new TextParticle(this)
+    this.tableParticle = new TableParticle(this)
     this.pageNumber = new PageNumber(this)
     new GlobalObserver(this)
 
@@ -456,6 +459,8 @@ export class Draw {
         if (element.type === ElementType.IMAGE) {
           this.textParticle.complete()
           this.imageParticle.render(ctx, element, x, y + offsetY)
+        } else if (element.type === ElementType.TABLE) {
+          this.tableParticle.render(ctx, element, x, y + offsetY)
         } else {
           this.textParticle.record(ctx, element, x, y + offsetY)
         }

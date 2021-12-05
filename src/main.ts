@@ -71,17 +71,38 @@ window.onload = function () {
   })
   data.push({
     type: ElementType.TABLE,
-    width: 500,
-    height: 300,
     value: `\n`,
     colgroup: [{
-      width: 250
+      width: 130
     }, {
-      width: 250
+      width: 130
+    }, {
+      width: 130
+    }, {
+      width: 130
     }],
     trList: [{
-      height: 150,
+      height: 40,
       tdList: [{
+        colspan: 1,
+        rowspan: 2,
+        value: [{ value: `\n` }]
+      }, {
+        colspan: 1,
+        rowspan: 1,
+        value: [{ value: `\n` }]
+      }, {
+        colspan: 2,
+        rowspan: 1,
+        value: [{ value: `\n` }]
+      }]
+    }, {
+      height: 40,
+      tdList: [{
+        colspan: 1,
+        rowspan: 1,
+        value: [{ value: `\n` }]
+      }, {
         colspan: 1,
         rowspan: 1,
         value: [{ value: `\n` }]
@@ -91,8 +112,16 @@ window.onload = function () {
         value: [{ value: `\n` }]
       }]
     }, {
-      height: 150,
+      height: 40,
       tdList: [{
+        colspan: 1,
+        rowspan: 1,
+        value: [{ value: `\n` }]
+      }, {
+        colspan: 1,
+        rowspan: 1,
+        value: [{ value: `\n` }]
+      }, {
         colspan: 1,
         rowspan: 1,
         value: [{ value: `\n` }]
