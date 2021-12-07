@@ -73,9 +73,9 @@ window.onload = function () {
     type: ElementType.TABLE,
     value: `\n`,
     colgroup: [{
-      width: 130
+      width: 180
     }, {
-      width: 130
+      width: 80
     }, {
       width: 130
     }, {
@@ -86,58 +86,69 @@ window.onload = function () {
       tdList: [{
         colspan: 1,
         rowspan: 2,
-        value: [{ value: `\n` }]
+        value: [{ value: `1`, size: 16 }]
       }, {
         colspan: 1,
         rowspan: 1,
-        value: [{ value: `\n` }]
+        value: [{ value: `2`, size: 16 }]
       }, {
         colspan: 2,
         rowspan: 1,
-        value: [{ value: `\n` }]
+        value: [{ value: `3`, size: 16 }]
       }]
     }, {
       height: 40,
       tdList: [{
         colspan: 1,
         rowspan: 1,
-        value: [{ value: `\n` }]
+        value: [{ value: `4`, size: 16 }]
       }, {
         colspan: 1,
         rowspan: 1,
-        value: [{ value: `\n` }]
+        value: [{ value: `5`, size: 16 }]
       }, {
         colspan: 1,
         rowspan: 1,
-        value: [{ value: `\n` }]
+        value: [{ value: `6`, size: 16 }]
       }]
     }, {
       height: 40,
       tdList: [{
         colspan: 1,
         rowspan: 1,
-        value: [{ value: `\n` }]
+        value: [{ value: `7`, size: 16 }]
       }, {
         colspan: 1,
         rowspan: 1,
-        value: [{ value: `\n` }]
+        value: [{ value: `8`, size: 16 }]
       }, {
         colspan: 1,
         rowspan: 1,
-        value: [{ value: `\n` }]
+        value: [{ value: `9`, size: 16 }]
       }, {
         colspan: 1,
         rowspan: 1,
-        value: [{ value: `\n` }]
+        value: [{ value: `0`, size: 16 }]
       }]
     }]
   })
+  data.push(...[{
+    value: 'E',
+    size: 16
+  }, {
+    value: 'O',
+    size: 16
+  }, {
+    value: 'F',
+    size: 16
+  }])
   // 初始化编辑器
   const container = document.querySelector<HTMLDivElement>('.editor')!
   const instance = new Editor(container, data, {
     margins: [100, 120, 100, 120]
   })
-  console.log('编辑器实例: ', instance)
+  console.log('实例: ', instance)
+  console.log('入参：', data)
 
   // 撤销、重做、格式刷、清除格式
   const undoDom = document.querySelector<HTMLDivElement>('.menu-item__undo')!

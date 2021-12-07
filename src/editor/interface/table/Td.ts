@@ -9,4 +9,9 @@ export interface ITd {
   colspan: number;
   rowspan: number;
   value: IElement[];
+  isLastRowTd?: boolean;
+  isLastColTd?: boolean;
+  isLastTd?: boolean;
+  rowIndex?: number;
+  colIndex?: number;
 }

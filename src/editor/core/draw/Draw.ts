@@ -309,25 +309,25 @@ export class Draw {
     return `${el.italic ? 'italic ' : ''}${el.bold ? 'bold ' : ''}${(el.size || defaultSize) * scale}px ${el.font || defaultFont}`
   }
 
-  private _computeRowList() {
+  private _computeRowList(innerWidth: number, elementList: IElement[]) {
     const { defaultSize, defaultRowMargin, scale } = this.options
-    const innerWidth = this.getInnerWidth()
     const defaultBasicRowMarginHeight = this.getDefaultBasicRowMarginHeight()
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
     const rowList: IRow[] = []
-    if (this.elementList.length) {
+    if (elementList.length) {
       rowList.push({
         width: 0,
         height: 0,
         ascent: 0,
         elementList: [],
-        rowFlex: this.elementList?.[1]?.rowFlex
+        rowFlex: elementList?.[1]?.rowFlex
       })
     }
-    for (let i = 0; i < this.elementList.length; i++) {
+    const tableElement = new Map<string, IElement[]>()
+    for (let i = 0; i < elementList.length; i++) {
       const curRow: IRow = rowList[rowList.length - 1]
-      const element = this.elementList[i]
+      const element = elementList[i]
       const rowMargin = defaultBasicRowMarginHeight * (element.rowMargin || defaultRowMargin)
       let metrics: IElementMetrics = {
         width: 0,
@@ -335,6 +335,7 @@ export class Draw {
         boundingBoxAscent: 0,
         boundingBoxDescent: 0
       }
+      const tableElementList: IRowElement[] = []
       if (element.type === ElementType.IMAGE) {
         const elementWidth = element.width! * scale
         const elementHeight = element.height! * scale
@@ -353,6 +354,37 @@ export class Draw {
           metrics.boundingBoxDescent = elementHeight
         }
         metrics.boundingBoxAscent = 0
+      } else if (element.type === ElementType.TABLE) {
+        // 计算表格行列
+        this.tableParticle.computeRowColInfo(element)
+        // 计算表格内元素信息
+        const trList = element.trList!
+        for (let t = 0; t < trList.length; t++) {
+          const tr = trList[t]
+          for (let d = 0; d < tr.tdList.length; d++) {
+            const td = tr.tdList[d]
+            const rowList = this._computeRowList(td.width!, td.value)
+            const rowHeight = rowList.reduce((pre, cur) => pre + cur.height, 0)
+            if (rowHeight > td.height!) {
+              tr.height += rowHeight - td.height!
+            }
+            for (let r = 0; r < rowList.length; r++) {
+              const row = rowList[r]
+              tableElementList.push(...row.elementList)
+            }
+          }
+        }
+        // 计算出表格高度
+        const tableHeight = trList.reduce((pre, cur) => pre + cur.height, 0)
+        const tableWidth = element.colgroup!.reduce((pre, cur) => pre + cur.width, 0)
+        const elementWidth = tableWidth * scale
+        const elementHeight = tableHeight * scale
+        metrics.width = elementWidth
+        metrics.height = elementHeight
+        metrics.boundingBoxDescent = elementHeight
+        metrics.boundingBoxAscent = 0
+        // 追加element
+        tableElement.set(element.id!, tableElementList)
       } else {
         metrics.height = (element.size || this.options.defaultSize) * scale
         ctx.font = this._getFont(element)
@@ -370,11 +402,16 @@ export class Draw {
         style: this._getFont(element, scale)
       }
       // 超过限定宽度
-      if (curRow.width + metrics.width > innerWidth || (i !== 0 && element.value === ZERO)) {
+      const preElement = elementList[i - 1]
+      if (
+        (preElement && preElement.type === ElementType.TABLE)
+        || curRow.width + metrics.width > innerWidth
+        || (i !== 0 && element.value === ZERO)
+      ) {
         rowList.push({
           width: metrics.width,
           height,
-          elementList: [rowElement],
+          elementList: [rowElement, ...tableElementList],
           ascent,
           rowFlex: rowElement.rowFlex
         })
@@ -391,7 +428,24 @@ export class Draw {
         curRow.elementList.push(rowElement)
       }
     }
-    this.rowList = rowList
+    if (tableElement.size) {
+      for (let e = 0; e < elementList.length; e++) {
+        const element = elementList[e]
+        if (!tableElement.size) break
+        if (element.type !== ElementType.TABLE) continue
+        const value = tableElement.get(element.id!)
+        if (value) {
+          let startIndex = 1
+          for (let v = 0; v < value.length; v++) {
+            const val = value[v]
+            elementList.splice(e + startIndex, 0, val)
+            startIndex += 1
+          }
+          tableElement.delete(element.id!)
+        }
+      }
+    }
+    return rowList
   }
 
   private _drawElement(positionList: IElementPosition[], rowList: IRow[], pageNo: number) {
@@ -426,6 +480,12 @@ export class Draw {
         const offsetY = element.type === ElementType.IMAGE
           ? curRow.ascent - metrics.height
           : curRow.ascent
+        // 表格内元素
+        if (element.tableId) {
+          // TODO：表格内元素绘制
+          const tableElement = curRow.elementList[0]
+
+        }
         const positionItem: IElementPosition = {
           pageNo,
           index,
@@ -460,7 +520,7 @@ export class Draw {
           this.textParticle.complete()
           this.imageParticle.render(ctx, element, x, y + offsetY)
         } else if (element.type === ElementType.TABLE) {
-          this.tableParticle.render(ctx, element, x, y + offsetY)
+          this.tableParticle.render(ctx, element, x, y)
         } else {
           this.textParticle.record(ctx, element, x, y + offsetY)
         }
@@ -496,9 +556,10 @@ export class Draw {
       isComputeRowList = true
     } = payload || {}
     const height = this.getHeight()
+    const innerWidth = this.getInnerWidth()
     // 计算行信息
     if (isComputeRowList) {
-      this._computeRowList()
+      this.rowList = this._computeRowList(innerWidth, this.elementList)
     }
     // 清除光标等副作用
     this.cursor.recoveryCursor()

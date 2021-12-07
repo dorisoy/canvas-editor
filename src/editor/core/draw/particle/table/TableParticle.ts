@@ -40,6 +40,93 @@ export class TableParticle {
     this.ctx.restore()
   }
 
+  public computeRowColInfo(element: IElement) {
+    const { colgroup, trList } = element
+    if (!colgroup || !trList) return
+    let x = 0
+    let y = 0
+    for (let t = 0; t < trList.length; t++) {
+      const tr = trList[t]
+      // 表格最后一行
+      const isLastTr = trList.length - 1 === t
+      // 当前行最小高度
+      let rowMinHeight = 0
+      for (let d = 0; d < tr.tdList.length; d++) {
+        const td = tr.tdList[d]
+        // 计算之前行x轴偏移量
+        let offsetXIndex = 0
+        if (trList.length > 1 && t !== 0) {
+          for (let pT = 0; pT < t; pT++) {
+            const pTr = trList[pT]
+            // 相同x轴是否存在跨行
+            for (let pD = 0; pD < pTr.tdList.length; pD++) {
+              const pTd = pTr.tdList[pD]
+              const pTdX = pTd.x!
+              const pTdY = pTd.y!
+              const pTdWidth = pTd.width!
+              const pTdHeight = pTd.height!
+              // 小于
+              if (pTdX < x) continue
+              if (pTdX > x) break
+              if (pTd.x === x && pTdY + pTdHeight > y) {
+                x += pTdWidth
+                offsetXIndex += 1
+              }
+            }
+          }
+        }
+        // 计算格列数
+        let colIndex = 0
+        const preTd = tr.tdList[d - 1]
+        if (preTd) {
+          colIndex = preTd.colIndex! + (offsetXIndex || 1)
+          if (preTd.colspan > 1) {
+            colIndex += preTd.colspan - 1
+          }
+        } else {
+          colIndex += offsetXIndex
+        }
+        // 计算格宽高
+        let width = 0
+        for (let col = 0; col < td.colspan; col++) {
+          width += colgroup[col + colIndex].width
+        }
+        let height = 0
+        for (let row = 0; row < td.rowspan; row++) {
+          height += trList[row + t].height
+        }
+        // y偏移量
+        if (rowMinHeight === 0 || rowMinHeight > height) {
+          rowMinHeight = height
+        }
+        // 当前行最后一个td
+        const isLastRowTd = tr.tdList.length - 1 === d
+        // 当前列最后一个td
+        let isLastColTd = isLastTr
+        if (!isLastColTd) {
+          if (td.rowspan > 1) {
+            const nextTrLength = trList.length - 1 - t
+            isLastColTd = td.rowspan - 1 === nextTrLength
+          }
+        }
+        // 当前表格最后一个td
+        const isLastTd = isLastTr && isLastRowTd
+        td.isLastRowTd = isLastRowTd
+        td.isLastColTd = isLastColTd
+        td.isLastTd = isLastTd
+        // 修改当前格clientBox
+        td.x = x
+        td.y = y
+        td.width = width
+        td.height = height
+        td.rowIndex = t
+        td.colIndex = colIndex
+        // 当前列x轴累加
+        x += width
+      }
+    }
+  }
+
   public render(ctx: CanvasRenderingContext2D, element: IElement, startX: number, startY: number) {
     const { colgroup, trList } = element
     if (!colgroup || !trList) return
@@ -86,14 +173,15 @@ export class TableParticle {
           }
         }
         // 计算格列数
-        let colIndex = offsetXIndex - 1
-        for (let c = 0; c < d + 1; c++) {
-          // 当前格+1（第一列）
-          if (c === d) {
-            colIndex += 1
-          } else {
-            colIndex += tr.tdList[c].colspan
+        let colIndex = 0
+        const preTd = tr.tdList[d - 1]
+        if (preTd) {
+          colIndex = preTd.colIndex! + (offsetXIndex || 1)
+          if (preTd.colspan > 1) {
+            colIndex += preTd.colspan - 1
           }
+        } else {
+          colIndex += offsetXIndex
         }
         // 计算格宽高
         let width = 0
@@ -127,6 +215,7 @@ export class TableParticle {
         td.y = y
         td.width = width
         td.height = height
+        td.colIndex = colIndex
 
         // 绘制选区
         // this._drawRange()

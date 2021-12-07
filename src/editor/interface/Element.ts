@@ -24,10 +24,18 @@ export interface IElementStyle {
   rowMargin?: number;
 }
 
-export interface ITable {
+export interface ITableAttr {
   colgroup?: IColgroup[];
   trList?: ITr[];
 }
+
+export interface ITableElement {
+  tdId?: string;
+  trId?: string;
+  tableId?: string;
+}
+
+export type ITable = ITableAttr & ITableElement
 
 export type IElement = IElementBasic & IElementStyle & ITable
 
