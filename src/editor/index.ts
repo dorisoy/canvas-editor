@@ -42,6 +42,7 @@ export default class Editor {
       marginIndicatorSize: 35,
       marginIndicatorColor: '#BABABA',
       margins: [100, 120, 100, 120],
+      tdPadding: 5,
       ...options
     }
     if (elementList[0]?.value !== ZERO) {
