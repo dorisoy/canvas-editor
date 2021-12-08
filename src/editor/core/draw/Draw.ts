@@ -1,6 +1,6 @@
 import { ZERO } from "../../dataset/constant/Common"
 import { RowFlex } from "../../dataset/enum/Row"
-import { IDrawOption } from "../../interface/Draw"
+import { IDrawOption, IDrawRowPayload, IDrawRowResult } from "../../interface/Draw"
 import { IEditorOption } from "../../interface/Editor"
 import { IElement, IElementMetrics, IElementPosition, IElementStyle } from "../../interface/Element"
 import { IRow, IRowElement } from "../../interface/Row"
@@ -324,7 +324,6 @@ export class Draw {
         rowFlex: elementList?.[1]?.rowFlex
       })
     }
-    const tableElement = new Map<string, IElement[]>()
     for (let i = 0; i < elementList.length; i++) {
       const curRow: IRow = rowList[rowList.length - 1]
       const element = elementList[i]
@@ -335,7 +334,6 @@ export class Draw {
         boundingBoxAscent: 0,
         boundingBoxDescent: 0
       }
-      const tableElementList: IRowElement[] = []
       if (element.type === ElementType.IMAGE) {
         const elementWidth = element.width! * scale
         const elementHeight = element.height! * scale
@@ -365,26 +363,23 @@ export class Draw {
             const td = tr.tdList[d]
             const rowList = this._computeRowList(td.width!, td.value)
             const rowHeight = rowList.reduce((pre, cur) => pre + cur.height, 0)
+            td.rowList = rowList
             if (rowHeight > td.height!) {
               tr.height += rowHeight - td.height!
-            }
-            for (let r = 0; r < rowList.length; r++) {
-              const row = rowList[r]
-              tableElementList.push(...row.elementList)
             }
           }
         }
         // 计算出表格高度
         const tableHeight = trList.reduce((pre, cur) => pre + cur.height, 0)
         const tableWidth = element.colgroup!.reduce((pre, cur) => pre + cur.width, 0)
+        element.width = tableWidth
+        element.height = tableHeight
         const elementWidth = tableWidth * scale
         const elementHeight = tableHeight * scale
         metrics.width = elementWidth
         metrics.height = elementHeight
         metrics.boundingBoxDescent = elementHeight
         metrics.boundingBoxAscent = 0
-        // 追加element
-        tableElement.set(element.id!, tableElementList)
       } else {
         metrics.height = (element.size || this.options.defaultSize) * scale
         ctx.font = this._getFont(element)
@@ -411,7 +406,7 @@ export class Draw {
         rowList.push({
           width: metrics.width,
           height,
-          elementList: [rowElement, ...tableElementList],
+          elementList: [rowElement],
           ascent,
           rowFlex: rowElement.rowFlex
         })
@@ -428,64 +423,33 @@ export class Draw {
         curRow.elementList.push(rowElement)
       }
     }
-    if (tableElement.size) {
-      for (let e = 0; e < elementList.length; e++) {
-        const element = elementList[e]
-        if (!tableElement.size) break
-        if (element.type !== ElementType.TABLE) continue
-        const value = tableElement.get(element.id!)
-        if (value) {
-          let startIndex = 1
-          for (let v = 0; v < value.length; v++) {
-            const val = value[v]
-            elementList.splice(e + startIndex, 0, val)
-            startIndex += 1
-          }
-          tableElement.delete(element.id!)
-        }
-      }
-    }
     return rowList
   }
 
-  private _drawElement(positionList: IElementPosition[], rowList: IRow[], pageNo: number) {
-    const width = this.getWidth()
-    const height = this.getHeight()
-    const margins = this.getMargins()
-    const ctx = this.ctxList[pageNo]
-    ctx.clearRect(0, 0, width, height)
-    // 绘制背景
-    this.background.render(ctx)
-    // 绘制页边距
-    const leftTopPoint: [number, number] = [margins[3], margins[0]]
-    this.margin.render(ctx)
-    // 渲染元素
-    let x = leftTopPoint[0]
-    let y = leftTopPoint[1]
-    let index = positionList.length
+  private _drawRow(ctx: CanvasRenderingContext2D, payload: IDrawRowPayload): IDrawRowResult {
+    const { positionList, rowList, pageNo, startX, startY, startIndex, innerWidth } = payload
+    let x = startX
+    let y = startY
+    let index = startIndex
     for (let i = 0; i < rowList.length; i++) {
       const curRow = rowList[i]
       // 计算行偏移量（行居左、居中、居右）
       if (curRow.rowFlex && curRow.rowFlex !== RowFlex.LEFT) {
-        const canvasInnerWidth = width - margins[1] - margins[3]
         if (curRow.rowFlex === RowFlex.CENTER) {
-          x += (canvasInnerWidth - curRow.width) / 2
+          x += (innerWidth - curRow.width) / 2
         } else {
-          x += canvasInnerWidth - curRow.width
+          x += innerWidth - curRow.width
         }
       }
+      // 当前td所在位置
+      let tablePreX = x
+      let tablePreY = y
       for (let j = 0; j < curRow.elementList.length; j++) {
         const element = curRow.elementList[j]
         const metrics = element.metrics
         const offsetY = element.type === ElementType.IMAGE
           ? curRow.ascent - metrics.height
           : curRow.ascent
-        // 表格内元素
-        if (element.tableId) {
-          // TODO：表格内元素绘制
-          const tableElement = curRow.elementList[0]
-
-        }
         const positionItem: IElementPosition = {
           pageNo,
           index,
@@ -535,11 +499,66 @@ export class Draw {
         }
         index++
         x += metrics.width
+        // 绘制表格内元素
+        if (element.type === ElementType.TABLE) {
+          for (let t = 0; t < element.trList!.length; t++) {
+            const tr = element.trList![t]
+            for (let d = 0; d < tr.tdList!.length; d++) {
+              const td = tr.tdList[d]
+              td.positionList = []
+              const drawRowResult = this._drawRow(ctx, {
+                positionList: td.positionList,
+                rowList: td.rowList!,
+                pageNo,
+                startIndex: 0,
+                startX: td.x! + tablePreX,
+                startY: td.y! + tablePreY,
+                innerWidth: td.width!
+              })
+              x = drawRowResult.x
+              y = drawRowResult.y
+            }
+          }
+          // 恢复初始x、y
+          x = tablePreX
+          y = tablePreY
+        }
       }
       this.textParticle.complete()
-      x = leftTopPoint[0]
+      x = startX
       y += curRow.height
     }
+    return { x, y, index }
+  }
+
+  private _drawPage(positionList: IElementPosition[], rowList: IRow[], pageNo: number) {
+    const width = this.getWidth()
+    const height = this.getHeight()
+    const margins = this.getMargins()
+    const innerWidth = this.getInnerWidth()
+    const ctx = this.ctxList[pageNo]
+    ctx.clearRect(0, 0, width, height)
+    // 绘制背景
+    this.background.render(ctx)
+    // 绘制页边距
+    const leftTopPoint: [number, number] = [margins[3], margins[0]]
+    this.margin.render(ctx)
+    // 渲染元素
+    let x = leftTopPoint[0]
+    let y = leftTopPoint[1]
+    let index = positionList.length
+    const drawRowResult = this._drawRow(ctx, {
+      positionList,
+      rowList,
+      pageNo,
+      startIndex: index,
+      startX: x,
+      startY: y,
+      innerWidth
+    })
+    x = drawRowResult.x
+    y = drawRowResult.y
+    index = drawRowResult.index
     // 绘制页码
     this.pageNumber.render(ctx, pageNo)
     // 搜索匹配绘制
@@ -588,7 +607,7 @@ export class Draw {
         this._createPage(i)
       }
       const rowList = pageRowList[i]
-      this._drawElement(positionList, rowList, i)
+      this._drawPage(positionList, rowList, i)
     }
     // 移除多余页
     setTimeout(() => {

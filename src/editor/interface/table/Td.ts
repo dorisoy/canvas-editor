@@ -1,4 +1,5 @@
-import { IElement } from "../Element"
+import { IElement, IElementPosition } from "../Element"
+import { IRow } from "../Row"
 
 export interface ITd {
   id?: string;
@@ -14,4 +15,6 @@ export interface ITd {
   isLastTd?: boolean;
   rowIndex?: number;
   colIndex?: number;
+  rowList?: IRow[];
+  positionList?: IElementPosition[];
 }
