@@ -148,7 +148,6 @@ window.onload = function () {
     margins: [100, 120, 100, 120]
   })
   console.log('实例: ', instance)
-  console.log('入参：', data)
 
   // 撤销、重做、格式刷、清除格式
   const undoDom = document.querySelector<HTMLDivElement>('.menu-item__undo')!
@@ -257,7 +256,74 @@ window.onload = function () {
     const li = evt.target as HTMLLIElement
     instance.command.executeRowMargin(Number(li.dataset.rowmargin!))
   }
-  // 图片上传、搜索、打印
+  // 表格插入、图片上传、搜索、打印
+  const tableDom = document.querySelector<HTMLDivElement>('.menu-item__table')!
+  const tablePanelContainer = document.querySelector<HTMLDivElement>('.menu-item__table__collapse')!
+  const tableTitle = document.querySelector<HTMLDivElement>('.table-select')!
+  const tablePanel = document.querySelector<HTMLDivElement>('.table-panel')!
+  // 绘制行列
+  const tableCellList: HTMLDivElement[][] = []
+  for (let i = 0; i < 10; i++) {
+    const tr = document.createElement('tr')
+    tr.classList.add('table-row')
+    const trCellList: HTMLDivElement[] = []
+    for (let j = 0; j < 10; j++) {
+      const td = document.createElement('td')
+      td.classList.add('table-cel')
+      tr.append(td)
+      trCellList.push(td)
+    }
+    tablePanel.append(tr)
+    tableCellList.push(trCellList)
+  }
+  // 移除所有格选择
+  function removeAllTableCellSelect() {
+    tableCellList.forEach(tr => {
+      tr.forEach(td => td.classList.remove('active'))
+    })
+  }
+  // 设置标题内容
+  function setTableTitle(payload: string) {
+    tableTitle.innerText = payload
+  }
+  tableDom.onclick = function () {
+    console.log('table')
+    tablePanelContainer!.style.display = 'block'
+  }
+  let colIndex = 0
+  let rowIndex = 0
+  tablePanel.onmousemove = function (evt) {
+    const celSize = 16
+    const rowMarginTop = 10
+    const celMarginRight = 6
+    const { offsetX, offsetY } = evt
+    // 移除所有选择
+    removeAllTableCellSelect()
+    colIndex = Math.ceil(offsetX / (celSize + celMarginRight))
+    rowIndex = Math.ceil(offsetY / (celSize + rowMarginTop))
+    // 改变选择样式
+    tableCellList.forEach((tr, trIndex) => {
+      tr.forEach((td, tdIndex) => {
+        if (tdIndex < colIndex && trIndex < rowIndex) {
+          td.classList.add('active')
+        }
+      })
+    })
+    // 改变表格标题
+    setTableTitle(`${rowIndex}×${colIndex}`)
+  }
+  tablePanel.onclick = function () {
+    // 应用选择
+    instance.command.executeInsertTable(rowIndex, colIndex)
+    // 还原选择样式、标题、选择行列
+    removeAllTableCellSelect()
+    setTableTitle('插入')
+    colIndex = 0
+    rowIndex = 0
+    // 隐藏panel
+    tablePanelContainer.style.display = 'none'
+  }
+
   const imageDom = document.querySelector<HTMLDivElement>('.menu-item__image')!
   const imageFileDom = document.querySelector<HTMLInputElement>('#image')!
   imageDom.onclick = function () {
@@ -382,7 +448,6 @@ window.onload = function () {
   }
 
   instance.listener.pageScaleChange = function (payload) {
-    console.log('payload: ', payload);
     document.querySelector<HTMLSpanElement>('.page-scale-percentage')!.innerText = `${Math.floor(payload * 10 * 10)}%`
   }
 
