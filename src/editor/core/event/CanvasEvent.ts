@@ -80,7 +80,12 @@ export class CanvasEvent {
       this.draw.setPageNo(Number(pageIndex))
     }
     // 结束位置
-    const { index: endIndex } = this.position.getPositionByXY(evt.offsetX, evt.offsetY)
+    const positionResult = this.position.getPositionByXY({
+      x: evt.offsetX,
+      y: evt.offsetY
+    })
+    const { index: endIndex, isTable, trIndex, tdIndex, tdValueIndex } = positionResult
+
     let end = ~endIndex ? endIndex : 0
     // 开始位置
     let start = this.mouseDownStartIndex
@@ -91,6 +96,10 @@ export class CanvasEvent {
     if (start === end) return
     // 绘制
     this.draw.render({
+      isTable,
+      trIndex,
+      tdIndex,
+      tdValueIndex,
       isSubmitHistory: false,
       isSetCursor: false,
       isComputeRowList: false
@@ -105,7 +114,11 @@ export class CanvasEvent {
       this.draw.setPageNo(Number(pageIndex))
     }
     this.isAllowDrag = true
-    const { index, isDirectHit, isImage } = this.position.getPositionByXY(evt.offsetX, evt.offsetY)
+    const positionResult = this.position.getPositionByXY({
+      x: evt.offsetX,
+      y: evt.offsetY
+    })
+    const { index, isDirectHit, isImage, isTable, trIndex, tdIndex, tdValueIndex } = positionResult
     // 记录选区开始位置
     this.mouseDownStartIndex = index
     // 绘制
@@ -113,6 +126,10 @@ export class CanvasEvent {
     if (~index) {
       this.range.setRange(index, index)
       this.draw.render({
+        isTable,
+        trIndex,
+        tdIndex,
+        tdValueIndex,
         curIndex: index,
         isSubmitHistory: false,
         isSetCursor: !isDirectHitImage,

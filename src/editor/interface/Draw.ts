@@ -6,6 +6,10 @@ export interface IDrawOption {
   isSetCursor?: boolean;
   isSubmitHistory?: boolean;
   isComputeRowList?: boolean;
+  isTable?: boolean;
+  trIndex?: number;
+  tdIndex?: number;
+  tdValueIndex?: number;
 }
 
 export interface IDrawImagePayload {

@@ -86,11 +86,17 @@ window.onload = function () {
       tdList: [{
         colspan: 1,
         rowspan: 2,
-        value: [{ value: `1`, size: 16 }]
+        value: [
+          { value: `1`, size: 16 },
+          { value: '0', size: 16 }
+        ]
       }, {
         colspan: 1,
         rowspan: 1,
-        value: [{ value: `2`, size: 16 }]
+        value: [
+          { value: `2`, size: 16 },
+          { value: '0', size: 16 }
+        ]
       }, {
         colspan: 2,
         rowspan: 1,

@@ -638,7 +638,13 @@ export class Draw {
       if (curIndex === undefined) {
         curIndex = positionList.length - 1
       }
-      this.position.setCursorPosition(positionList[curIndex!] || null)
+      if (payload?.isTable) {
+        const { trIndex, tdIndex, tdValueIndex } = payload
+        const tablePosition = this.elementList[curIndex].trList?.[trIndex!].tdList[tdIndex!].positionList?.[tdValueIndex!]
+        this.position.setCursorPosition(tablePosition || null)
+      } else {
+        this.position.setCursorPosition(positionList[curIndex!] || null)
+      }
       this.cursor.drawCursor()
     }
     // 历史记录用于undo、redo
