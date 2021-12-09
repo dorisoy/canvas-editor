@@ -78,7 +78,7 @@ ul {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 6px;
+  margin: 0 5px;
 }
 
 .menu-item>div:hover {
@@ -295,6 +295,17 @@ ul {
   left: 0;
   padding: 14px 27px;
   cursor: auto;
+}
+
+.menu-item .menu-item__table__collapse .table-close {
+  position: absolute;
+  right: 10px;
+  top: 5px;
+  cursor: pointer;
+}
+
+.menu-item .menu-item__table__collapse .table-close:hover {
+  color: #7d7e80;
 }
 
 .menu-item .menu-item__table__collapse:hover {
