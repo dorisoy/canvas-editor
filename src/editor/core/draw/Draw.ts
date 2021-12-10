@@ -381,7 +381,7 @@ export class Draw {
             const rowHeight = rowList.reduce((pre, cur) => pre + cur.height, 0)
             td.rowList = rowList
             if (rowHeight > td.height! - tdGap) {
-              tr.height = td.height! + tdGap
+              tr.height = rowHeight + tdGap
               isTrHeightChange = true
             }
           }
@@ -516,7 +516,10 @@ export class Draw {
         if (startIndex !== endIndex && startIndex < index && index <= endIndex) {
           const positionContext = this.position.getPositionContext()
           // 表格需限定上下文
-          if (!positionContext.isTable || positionContext.tdId === element.tdId) {
+          if (
+            (!positionContext.isTable && !element.tdId)
+            || positionContext.tdId === element.tdId
+          ) {
             let rangeWidth = metrics.width
             if (rangeWidth === 0 && curRow.elementList.length === 1) {
               rangeWidth = this.options.rangeMinWidth
