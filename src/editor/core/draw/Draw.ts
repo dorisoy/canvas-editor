@@ -372,7 +372,7 @@ export class Draw {
             const rowHeight = rowList.reduce((pre, cur) => pre + cur.height, 0)
             td.rowList = rowList
             if (rowHeight > td.height! - tdGap) {
-              tr.height += rowHeight - td.height!
+              tr.height = td.height! + tdGap
               isTrHeightChange = true
             }
           }

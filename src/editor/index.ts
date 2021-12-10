@@ -43,8 +43,19 @@ export default class Editor {
       marginIndicatorColor: '#BABABA',
       margins: [100, 120, 100, 120],
       tdPadding: 5,
+      defaultTdHeight: 40,
       ...options
     }
+    this._formatElement(elementList)
+    // 监听
+    this.listener = new Listener()
+    // 启动
+    const draw = new Draw(container, editorOptions, elementList, this.listener)
+    // 命令
+    this.command = new Command(new CommandAdapt(draw))
+  }
+
+  private _formatElement(elementList: IElement[]) {
     if (elementList[0]?.value !== ZERO) {
       elementList.unshift({
         value: ZERO
@@ -64,6 +75,7 @@ export default class Editor {
               const td = tr.tdList[d]
               const tdId = getUUID()
               td.id = tdId
+              this._formatElement(td.value)
               for (let v = 0; v < td.value.length; v++) {
                 const value = td.value[v]
                 value.tdId = tdId
@@ -81,12 +93,6 @@ export default class Editor {
         el.id = getUUID()
       }
     }
-    // 监听
-    this.listener = new Listener()
-    // 启动
-    const draw = new Draw(container, editorOptions, elementList, this.listener)
-    // 命令
-    this.command = new Command(new CommandAdapt(draw))
   }
 
 }

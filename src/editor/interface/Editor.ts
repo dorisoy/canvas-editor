@@ -25,4 +25,5 @@ export interface IEditorOption {
   marginIndicatorColor?: string,
   margins?: [top: number, right: number, bootom: number, left: number],
   tdPadding?: number;
+  defaultTdHeight?: number;
 }
