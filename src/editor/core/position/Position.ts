@@ -25,7 +25,17 @@ export class Position {
     this.options = draw.getOptions()
   }
 
+  public getOriginalPositionList(): IElementPosition[] {
+    return this.positionList
+  }
+
   public getPositionList(): IElementPosition[] {
+    const { isTable } = this.positionContext
+    if (isTable) {
+      const { index, trIndex, tdIndex } = this.positionContext
+      const elementList = this.draw.getOriginalElementList()
+      return elementList[index!].trList![trIndex!].tdList[tdIndex!].positionList || []
+    }
     return this.positionList
   }
 

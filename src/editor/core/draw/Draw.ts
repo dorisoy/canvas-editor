@@ -450,6 +450,7 @@ export class Draw {
   private _drawRow(ctx: CanvasRenderingContext2D, payload: IDrawRowPayload): IDrawRowResult {
     const { positionList, rowList, pageNo, startX, startY, startIndex, innerWidth } = payload
     const tdPadding = this.getTdPadding()
+    const tdGap = tdPadding * 2
     let x = startX
     let y = startY
     let index = startIndex
@@ -539,7 +540,7 @@ export class Draw {
                 startIndex: 0,
                 startX: td.x! + tablePreX + tdPadding,
                 startY: td.y! + tablePreY,
-                innerWidth: td.width!
+                innerWidth: td.width! - tdGap
               })
               x = drawRowResult.x
               y = drawRowResult.y
@@ -609,7 +610,7 @@ export class Draw {
     // 清除光标等副作用
     this.cursor.recoveryCursor()
     this.position.setPositionList([])
-    const positionList = this.position.getPositionList()
+    const positionList = this.position.getOriginalPositionList()
     // 按页渲染
     const margins = this.getMargins()
     const marginHeight = margins[0] + margins[2]
@@ -667,8 +668,10 @@ export class Draw {
       const oldElementList = deepClone(this.elementList)
       const { startIndex, endIndex } = this.range.getRange()
       const pageNo = this.pageNo
+      const oldPositionContext = deepClone(this.position.getPositionContext())
       this.historyManager.execute(function () {
         self.setPageNo(pageNo)
+        self.position.setPositionContext(oldPositionContext)
         self.range.setRange(startIndex, endIndex)
         self.elementList = deepClone(oldElementList)
         self.render({ curIndex, isSubmitHistory: false })
