@@ -10,6 +10,7 @@ import { IColgroup } from "../../interface/table/Colgroup"
 import { ITd } from "../../interface/table/Td"
 import { ITr } from "../../interface/table/Tr"
 import { getUUID } from "../../utils"
+import { formatElementList } from "../../utils/element"
 import { printImageBase64 } from "../../utils/print"
 import { Draw } from "../draw/Draw"
 import { HistoryManager } from "../history/HistoryManager"
@@ -243,17 +244,19 @@ export class CommandAdapt {
         tdList.push({
           colspan: 1,
           rowspan: 1,
-          value: [{ value: '\n', size: 16 }]
+          value: [{ value: ZERO, size: 16 }]
         })
       }
       trList.push(tr)
     }
     const element: IElement = {
       type: ElementType.TABLE,
-      value: `\n`,
+      value: ZERO,
       colgroup,
       trList
     }
+    // 格式化element
+    formatElementList([element])
     const curIndex = startIndex + 1
     if (startIndex === endIndex) {
       elementList.splice(curIndex, 0, element)

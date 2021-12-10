@@ -203,8 +203,16 @@ export class CanvasEvent {
       this.range.setRange(curIndex, curIndex)
       this.draw.render({ curIndex })
     } else if (evt.key === KeyMap.Enter) {
+      // 表格需要上下文信息
+      const positionContext = this.position.getPositionContext()
+      let restArg = {}
+      if (positionContext.isTable) {
+        const { tdId, trId, tableId } = positionContext
+        restArg = { tdId, trId, tableId }
+      }
       const enterText: IElement = {
-        value: ZERO
+        value: ZERO,
+        ...restArg
       }
       if (isCollspace) {
         elementList.splice(index + 1, 0, enterText)
@@ -313,8 +321,16 @@ export class CanvasEvent {
     const { index } = cursorPosition
     const { startIndex, endIndex } = this.range.getRange()
     const isCollspace = startIndex === endIndex
+    // 表格需要上下文信息
+    const positionContext = this.position.getPositionContext()
+    let restArg = {}
+    if (positionContext.isTable) {
+      const { tdId, trId, tableId } = positionContext
+      restArg = { tdId, trId, tableId }
+    }
     const inputData: IElement[] = data.split('').map(value => ({
-      value
+      value,
+      ...restArg
     }))
     let start = 0
     if (isCollspace) {

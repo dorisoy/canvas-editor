@@ -516,7 +516,7 @@ export class Draw {
         if (startIndex !== endIndex && startIndex < index && index <= endIndex) {
           const positionContext = this.position.getPositionContext()
           // 表格需限定上下文
-          if (!element.tdId || positionContext.tdId === element.tdId) {
+          if (!positionContext.isTable || positionContext.tdId === element.tdId) {
             let rangeWidth = metrics.width
             if (rangeWidth === 0 && curRow.elementList.length === 1) {
               rangeWidth = this.options.rangeMinWidth
