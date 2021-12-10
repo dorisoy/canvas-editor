@@ -209,6 +209,15 @@ export class Draw {
   }
 
   public getElementList(): IElement[] {
+    const positionContext = this.position.getPositionContext()
+    if (positionContext.isTable) {
+      const { index, trIndex, tdIndex } = positionContext
+      return this.elementList[index!].trList![trIndex!].tdList[tdIndex!].value
+    }
+    return this.elementList
+  }
+
+  public getOriginalElementList() {
     return this.elementList
   }
 
@@ -504,11 +513,15 @@ export class Draw {
         // 选区绘制
         const { startIndex, endIndex } = this.range.getRange()
         if (startIndex !== endIndex && startIndex < index && index <= endIndex) {
-          let rangeWidth = metrics.width
-          if (rangeWidth === 0 && curRow.elementList.length === 1) {
-            rangeWidth = this.options.rangeMinWidth
+          const positionContext = this.position.getPositionContext()
+          // 表格需限定上下文
+          if (!element.tdId || positionContext.tdId === element.tdId) {
+            let rangeWidth = metrics.width
+            if (rangeWidth === 0 && curRow.elementList.length === 1) {
+              rangeWidth = this.options.rangeMinWidth
+            }
+            this.range.render(ctx, x, y, rangeWidth, curRow.height)
           }
-          this.range.render(ctx, x, y, rangeWidth, curRow.height)
         }
         index++
         x += metrics.width
@@ -638,9 +651,10 @@ export class Draw {
       if (curIndex === undefined) {
         curIndex = positionList.length - 1
       }
-      if (payload?.isTable) {
-        const { trIndex, tdIndex, tdValueIndex } = payload
-        const tablePosition = this.elementList[curIndex].trList?.[trIndex!].tdList[tdIndex!].positionList?.[tdValueIndex!]
+      const positionContext = this.position.getPositionContext()
+      if (positionContext.isTable) {
+        const { index, trIndex, tdIndex } = positionContext
+        const tablePosition = this.elementList[index!].trList?.[trIndex!].tdList[tdIndex!].positionList?.[curIndex!]
         this.position.setCursorPosition(tablePosition || null)
       } else {
         this.position.setCursorPosition(positionList[curIndex!] || null)

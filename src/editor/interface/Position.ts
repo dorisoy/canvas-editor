@@ -10,6 +10,9 @@ export interface ICurrentPosition {
   trIndex?: number;
   tdIndex?: number;
   tdValueIndex?: number;
+  tdId?: string;
+  trId?: string;
+  tableId?: string;
 }
 
 export interface IGetPositionByXYPayload {
@@ -20,4 +23,14 @@ export interface IGetPositionByXYPayload {
   tablePosition?: IElementPosition;
   elementList?: IElement[];
   positionList?: IElementPosition[];
+}
+
+export interface IPositionContext {
+  isTable: boolean;
+  index?: number;
+  trIndex?: number;
+  tdIndex?: number;
+  tdId?: string;
+  trId?: string;
+  tableId?: string;
 }

@@ -84,8 +84,8 @@ export class CanvasEvent {
       x: evt.offsetX,
       y: evt.offsetY
     })
-    const { index: endIndex, isTable, trIndex, tdIndex, tdValueIndex } = positionResult
-
+    const { index, isTable, tdValueIndex } = positionResult
+    let endIndex = isTable ? tdValueIndex! : index
     let end = ~endIndex ? endIndex : 0
     // 开始位置
     let start = this.mouseDownStartIndex
@@ -96,10 +96,6 @@ export class CanvasEvent {
     if (start === end) return
     // 绘制
     this.draw.render({
-      isTable,
-      trIndex,
-      tdIndex,
-      tdValueIndex,
       isSubmitHistory: false,
       isSetCursor: false,
       isComputeRowList: false
@@ -118,19 +114,42 @@ export class CanvasEvent {
       x: evt.offsetX,
       y: evt.offsetY
     })
-    const { index, isDirectHit, isImage, isTable, trIndex, tdIndex, tdValueIndex } = positionResult
+    const {
+      index,
+      isDirectHit,
+      isImage,
+      isTable,
+      trIndex,
+      tdIndex,
+      tdValueIndex,
+      tdId,
+      trId,
+      tableId
+    } = positionResult
+    // 设置位置上下文
+    this.position.setPositionContext({
+      isTable: isTable || false,
+      index,
+      trIndex,
+      tdIndex,
+      tdId,
+      trId,
+      tableId
+    })
     // 记录选区开始位置
-    this.mouseDownStartIndex = index
+    this.mouseDownStartIndex = isTable ? tdValueIndex! : index
     // 绘制
     const isDirectHitImage = isDirectHit && isImage
     if (~index) {
-      this.range.setRange(index, index)
+      let curIndex = index
+      if (isTable) {
+        this.range.setRange(tdValueIndex!, tdValueIndex!)
+        curIndex = tdValueIndex!
+      } else {
+        this.range.setRange(index, index)
+      }
       this.draw.render({
-        isTable,
-        trIndex,
-        tdIndex,
-        tdValueIndex,
-        curIndex: index,
+        curIndex,
         isSubmitHistory: false,
         isSetCursor: !isDirectHitImage,
         isComputeRowList: false

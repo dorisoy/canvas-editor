@@ -2,12 +2,13 @@ import { ElementType } from "../.."
 import { ZERO } from "../../dataset/constant/Common"
 import { IEditorOption } from "../../interface/Editor"
 import { IElementPosition } from "../../interface/Element"
-import { ICurrentPosition, IGetPositionByXYPayload } from "../../interface/Position"
+import { ICurrentPosition, IGetPositionByXYPayload, IPositionContext } from "../../interface/Position"
 import { Draw } from "../draw/Draw"
 
 export class Position {
 
   private cursorPosition: IElementPosition | null
+  private positionContext: IPositionContext
   private positionList: IElementPosition[]
 
   private draw: Draw
@@ -16,6 +17,9 @@ export class Position {
   constructor(draw: Draw) {
     this.positionList = []
     this.cursorPosition = null
+    this.positionContext = {
+      isTable: false
+    }
 
     this.draw = draw
     this.options = draw.getOptions()
@@ -37,11 +41,19 @@ export class Position {
     return this.cursorPosition
   }
 
+  public getPositionContext(): IPositionContext {
+    return this.positionContext
+  }
+
+  public setPositionContext(payload: IPositionContext) {
+    this.positionContext = payload
+  }
+
   public getPositionByXY(payload: IGetPositionByXYPayload): ICurrentPosition {
     const { x, y, isTable } = payload
     let { elementList, positionList } = payload
     if (!elementList) {
-      elementList = this.draw.getElementList()
+      elementList = this.draw.getOriginalElementList()
     }
     if (!positionList) {
       positionList = this.positionList
@@ -73,9 +85,12 @@ export class Position {
                 return {
                   index,
                   isTable: true,
-                  trIndex: t,
                   tdIndex: d,
-                  tdValueIndex: tablePosition.index
+                  trIndex: t,
+                  tdValueIndex: tablePosition.index,
+                  tdId: td.id,
+                  trId: tr.id,
+                  tableId: element.id
                 }
               }
             }
