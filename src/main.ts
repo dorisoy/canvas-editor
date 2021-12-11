@@ -3,7 +3,7 @@ import Editor, { ElementType, IElement, RowFlex } from './editor'
 
 window.onload = function () {
 
-  const text = `人民医院门诊病历\n主诉：\n发热三天，咳嗽五天。\n现病史：\n患者于三天前无明显诱因，感冒后发现面部水肿，无皮疹，尿量减少，出现乏力，在外治疗无好转，现来我院就诊。\n既往史：\n有糖尿病10年，有高血压2年，有传染性疾病1年。没有报告其他既往疾病。\n流行病史：\n否认14天内接触过新冠肺炎确诊患者、疑似患者、无症状感染者及其密切接触者；否认14天内去过以下场所：水产、肉类批发市场，农贸市场，集市，大型超市，夜市；否认14天内与以下场所工作人员密切接触：水产、肉类批发市场，农贸市场，集市，大型超市；否认14天内周围（如家庭、办公室）有2例以上聚集性发病；否认14天内接触过有发热或呼吸道症状的人员；否认14天内自身有发热或呼吸道症状；否认14天内接触过纳入隔离观察的人员及其他可能与新冠肺炎关联的情形；陪同家属{有无选择代码}有以上情况。\n体格检查：\nT：36.5℃，P：80bpm，R：20次/分，BP：120/80mmHg；\n辅助检查：\n2020年6月10日，普放：血细胞比容36.50%（偏低）40～50；单核细胞绝对值0.75*10^9/L（偏高）参考值：0.1～0.6；\n门诊诊断：\n1.高血压\n2.糖尿病\n3.病毒性感冒\n4.过敏性鼻炎\n5.过敏性鼻息肉\n处置治疗：\n1.超声引导下甲状腺细针穿刺术；\n2.乙型肝炎表面抗体测定；\n3.膜式病变细胞采集术、后颈皮下肤层；\n电子签名：【】`
+  const text = `人民医院门诊病历\n主诉：\n发热三天，咳嗽五天。\n现病史：\n患者于三天前无明显诱因，感冒后发现面部水肿，无皮疹，尿量减少，出现乏力，在外治疗无好转，现来我院就诊。\n既往史：\n有糖尿病10年，有高血压2年，有传染性疾病1年。没有报告其他既往疾病。\n流行病史：\n否认14天内接触过新冠肺炎确诊患者、疑似患者、无症状感染者及其密切接触者；否认14天内去过以下场所：水产、肉类批发市场，农贸市场，集市，大型超市，夜市；否认14天内与以下场所工作人员密切接触：水产、肉类批发市场，农贸市场，集市，大型超市；否认14天内周围（如家庭、办公室）有2例以上聚集性发病；否认14天内接触过有发热或呼吸道症状的人员；否认14天内自身有发热或呼吸道症状；否认14天内接触过纳入隔离观察的人员及其他可能与新冠肺炎关联的情形；陪同家属{有无选择代码}有以上情况。\n体格检查：\nT：36.5℃，P：80bpm，R：20次/分，BP：120/80mmHg；\n辅助检查：\n2020年6月10日，普放：血细胞比容36.50%（偏低）40～50；单核细胞绝对值0.75*10^9/L（偏高）参考值：0.1～0.6；\n门诊诊断：\n1.高血压\n2.糖尿病\n3.病毒性感冒\n4.过敏性鼻炎\n5.过敏性鼻息肉\n处置治疗：\n1.超声引导下甲状腺细针穿刺术；\n2.乙型肝炎表面抗体测定；\n3.膜式病变细胞采集术、后颈皮下肤层；\n电子签名：【】\n其他记录：`
   // 模拟行居中
   const centerText = ['人民医院门诊病历']
   const centerIndex: number[] = centerText.map(c => {
@@ -11,7 +11,7 @@ window.onload = function () {
     return ~i ? Array(c.length).fill(i).map((_, j) => i + j) : []
   }).flat()
   // 模拟加粗字
-  const boldText = ['主诉：', '现病史：', '既往史：', '流行病史：', '体格检查：', '辅助检查：', '门诊诊断：', '处置治疗：', '电子签名：']
+  const boldText = ['主诉：', '现病史：', '既往史：', '流行病史：', '体格检查：', '辅助检查：', '门诊诊断：', '处置治疗：', '电子签名：', '其他记录：']
   const boldIndex: number[] = boldText.map(b => {
     const i = text.indexOf(b)
     return ~i ? Array(b.length).fill(i).map((_, j) => i + j) : []
@@ -88,53 +88,78 @@ window.onload = function () {
         rowspan: 2,
         value: [
           { value: `1`, size: 16 },
-          { value: '0', size: 16 }
+          { value: '.', size: 16 }
         ]
       }, {
         colspan: 1,
         rowspan: 1,
         value: [
           { value: `2`, size: 16 },
-          { value: '0', size: 16 }
+          { value: '.', size: 16 }
         ]
       }, {
         colspan: 2,
         rowspan: 1,
-        value: [{ value: `3`, size: 16 }]
+        value: [
+          { value: `3`, size: 16 },
+          { value: '.', size: 16 }
+        ]
       }]
     }, {
       height: 40,
       tdList: [{
         colspan: 1,
         rowspan: 1,
-        value: [{ value: `4`, size: 16 }]
+        value: [
+          { value: `4`, size: 16 },
+          { value: '.', size: 16 }
+        ]
       }, {
         colspan: 1,
         rowspan: 1,
-        value: [{ value: `5`, size: 16 }]
+        value: [
+          { value: `5`, size: 16 },
+          { value: '.', size: 16 }
+        ]
       }, {
         colspan: 1,
         rowspan: 1,
-        value: [{ value: `6`, size: 16 }]
+        value: [
+          { value: `6`, size: 16 },
+          { value: '.', size: 16 }
+        ]
       }]
     }, {
       height: 40,
       tdList: [{
         colspan: 1,
         rowspan: 1,
-        value: [{ value: `7`, size: 16 }]
+        value: [
+          { value: `7`, size: 16 },
+          { value: '.', size: 16 }
+        ]
       }, {
         colspan: 1,
         rowspan: 1,
-        value: [{ value: `8`, size: 16 }]
+        value: [
+          { value: `8`, size: 16 },
+          { value: '.', size: 16 }
+        ]
       }, {
         colspan: 1,
         rowspan: 1,
-        value: [{ value: `9`, size: 16 }]
+        value: [
+          { value: `9`, size: 16 },
+          { value: '.', size: 16 }
+        ]
       }, {
         colspan: 1,
         rowspan: 1,
-        value: [{ value: `0`, size: 16 }]
+        value: [
+          { value: `1`, size: 16 },
+          { value: `0`, size: 16 },
+          { value: '.', size: 16 }
+        ]
       }]
     }]
   })
