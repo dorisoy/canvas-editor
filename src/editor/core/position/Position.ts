@@ -94,6 +94,8 @@ export class Position {
               if (~tablePosition.index) {
                 return {
                   index,
+                  isImage: tablePosition.isImage,
+                  isDirectHit: tablePosition.isDirectHit,
                   isTable: true,
                   tdIndex: d,
                   trIndex: t,

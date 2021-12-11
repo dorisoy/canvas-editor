@@ -160,7 +160,8 @@ export class CanvasEvent {
     if (isDirectHitImage) {
       const elementList = this.draw.getElementList()
       const positionList = this.position.getPositionList()
-      this.imageParticle.drawResizer(elementList[index], positionList[index])
+      const curIndex = isTable ? tdValueIndex! : index
+      this.imageParticle.drawResizer(elementList[curIndex], positionList[curIndex])
     }
   }
 
