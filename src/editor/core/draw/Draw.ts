@@ -323,9 +323,8 @@ export class Draw {
   }
 
   private _computeRowList(innerWidth: number, elementList: IElement[]) {
-    const { defaultSize, defaultRowMargin, scale } = this.options
+    const { defaultSize, defaultRowMargin, scale, tdPadding } = this.options
     const defaultBasicRowMarginHeight = this.getDefaultBasicRowMarginHeight()
-    const tdPadding = this.getTdPadding()
     const tdGap = tdPadding * 2
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
@@ -371,25 +370,25 @@ export class Draw {
         // 计算表格行列
         this.tableParticle.computeRowColInfo(element)
         // 计算表格内元素信息
-        let isTrHeightChange = false
         const trList = element.trList!
         for (let t = 0; t < trList.length; t++) {
           const tr = trList[t]
+          let maxTrHeight = 0
           for (let d = 0; d < tr.tdList.length; d++) {
             const td = tr.tdList[d]
-            const rowList = this._computeRowList(td.width! - tdGap, td.value)
+            const rowList = this._computeRowList((td.width! - tdGap) * scale, td.value)
             const rowHeight = rowList.reduce((pre, cur) => pre + cur.height, 0)
             td.rowList = rowList
-            if (rowHeight > td.height! - tdGap) {
-              tr.height = rowHeight + tdGap
-              isTrHeightChange = true
+            // 移除缩放导致的行高变化-渲染时会进行缩放调整
+            const curTrHeight = (rowHeight + tdGap) / scale
+            if (maxTrHeight < curTrHeight) {
+              maxTrHeight = curTrHeight
             }
           }
+          tr.height = maxTrHeight
         }
         // 需要重新计算表格内值
-        if (isTrHeightChange) {
-          this.tableParticle.computeRowColInfo(element)
-        }
+        this.tableParticle.computeRowColInfo(element)
         // 计算出表格高度
         const tableHeight = trList.reduce((pre, cur) => pre + cur.height, 0)
         const tableWidth = element.colgroup!.reduce((pre, cur) => pre + cur.width, 0)
@@ -449,7 +448,7 @@ export class Draw {
 
   private _drawRow(ctx: CanvasRenderingContext2D, payload: IDrawRowPayload): IDrawRowResult {
     const { positionList, rowList, pageNo, startX, startY, startIndex, innerWidth } = payload
-    const tdPadding = this.getTdPadding()
+    const { scale, tdPadding } = this.options
     const tdGap = tdPadding * 2
     let x = startX
     let y = startY
@@ -541,9 +540,9 @@ export class Draw {
                 rowList: td.rowList!,
                 pageNo,
                 startIndex: 0,
-                startX: td.x! + tablePreX + tdPadding,
-                startY: td.y! + tablePreY,
-                innerWidth: td.width! - tdGap
+                startX: (td.x! + tdPadding) * scale + tablePreX,
+                startY: td.y! * scale + tablePreY,
+                innerWidth: (td.width! - tdGap) * scale
               })
               x = drawRowResult.x
               y = drawRowResult.y

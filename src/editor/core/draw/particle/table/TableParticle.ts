@@ -123,8 +123,11 @@ export class TableParticle {
   }
 
   public render(ctx: CanvasRenderingContext2D, element: IElement, startX: number, startY: number) {
-    const { colgroup, trList, width: tableWidth, height: tableHeight } = element
-    if (!colgroup || !trList || !tableWidth || !tableHeight) return
+    const { colgroup, trList } = element
+    if (!colgroup || !trList) return
+    const { scale } = this.options
+    const tableWidth = element.width! * scale
+    const tableHeight = element.height! * scale
     ctx.save()
     // 渲染边框
     this._drawBorder(ctx, startX, startY, tableWidth, tableHeight)
@@ -133,29 +136,31 @@ export class TableParticle {
       const tr = trList[t]
       for (let d = 0; d < tr.tdList.length; d++) {
         const td = tr.tdList[d]
-        const { isLastRowTd, isLastColTd, isLastTd, width, height } = td
-        const x = td.x! + startX + width!
-        const y = td.y! + startY
+        const { isLastRowTd, isLastColTd, isLastTd } = td
+        const width = td.width! * scale
+        const height = td.height! * scale
+        const x = td.x! * scale + startX + width
+        const y = td.y! * scale + startY
         // 绘制线条
         ctx.beginPath()
         if (isLastRowTd && !isLastTd) {
           // 是否跨行到底
-          if (y + height! < startY + tableHeight) {
-            ctx.moveTo(x, y + height!)
-            ctx.lineTo(x - width!, y + height!)
+          if (y + height < startY + tableHeight) {
+            ctx.moveTo(x, y + height)
+            ctx.lineTo(x - width, y + height)
           }
         } else if (isLastColTd && !isLastTd) {
           ctx.moveTo(x, y)
-          ctx.lineTo(x, y + height!)
+          ctx.lineTo(x, y + height)
         } else if (!isLastRowTd && !isLastColTd && !isLastTd) {
           ctx.moveTo(x, y)
-          ctx.lineTo(x, y + height!)
-          ctx.lineTo(x - width!, y + height!)
+          ctx.lineTo(x, y + height)
+          ctx.lineTo(x - width, y + height)
         } else if (isLastTd) {
           // 是否跨列到最右
-          if (x + width! === startX + tableWidth) {
+          if (x + width === startX + tableWidth) {
             ctx.moveTo(x, y)
-            ctx.lineTo(x, y + height!)
+            ctx.lineTo(x, y + height)
           }
         }
         ctx.stroke()
