@@ -1,3 +1,4 @@
+import { ElementType } from "../.."
 import { ZERO } from "../../dataset/constant/Common"
 import { ElementStyleKey } from "../../dataset/enum/ElementStyle"
 import { MouseEventButton } from "../../dataset/enum/Event"
@@ -6,6 +7,7 @@ import { IElement } from "../../interface/Element"
 import { writeTextByElementList } from "../../utils/clipboard"
 import { Cursor } from "../cursor/Cursor"
 import { Draw } from "../draw/Draw"
+import { HyperlinkParticle } from "../draw/particle/HyperlinkParticle"
 import { ImageParticle } from "../draw/particle/ImageParticle"
 import { TableTool } from "../draw/particle/table/TableTool"
 import { HistoryManager } from "../history/HistoryManager"
@@ -27,6 +29,7 @@ export class CanvasEvent {
   private historyManager: HistoryManager
   private imageParticle: ImageParticle
   private tableTool: TableTool
+  private hyperlinkParticle: HyperlinkParticle
 
   constructor(draw: Draw) {
     this.isAllowDrag = false
@@ -42,6 +45,7 @@ export class CanvasEvent {
     this.historyManager = this.draw.getHistoryManager()
     this.imageParticle = this.draw.getImageParticle()
     this.tableTool = this.draw.getTableTool()
+    this.hyperlinkParticle = this.draw.getHyperlinkParticle()
   }
 
   public register() {
@@ -174,6 +178,14 @@ export class CanvasEvent {
       const elementList = this.draw.getOriginalElementList()
       const positionList = this.position.getOriginalPositionList()
       this.tableTool.render(elementList[index], positionList[index])
+    }
+    // 超链接
+    this.hyperlinkParticle.clearHyperlinkPopup()
+    const elementList = this.draw.getElementList()
+    const positionList = this.position.getPositionList()
+    const curIndex = isTable ? tdValueIndex! : index
+    if (elementList[curIndex].type === ElementType.HYPERLINK) {
+      this.hyperlinkParticle.drawHyperlinkPopup(elementList[curIndex], positionList[curIndex])
     }
   }
 
@@ -332,6 +344,7 @@ export class CanvasEvent {
     const element = elementList[endIndex]
     const inputData: IElement[] = text.split('').map(value => ({
       value,
+      type: element.type,
       font: element.font,
       size: element.size,
       bold: element.bold,
@@ -340,6 +353,8 @@ export class CanvasEvent {
       italic: element.italic,
       underline: element.underline,
       strikeout: element.strikeout,
+      url: element.url,
+      hyperlinkId: element.hyperlinkId,
       ...restArg
     }))
     let start = 0

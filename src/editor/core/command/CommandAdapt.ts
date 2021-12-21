@@ -706,7 +706,8 @@ export class CommandAdapt {
       // 搜索文本
       function searchClosure(payload: string | null, type: EditorContext, elementList: IElement[], restArgs?: ISearchResultRestArgs) {
         if (!payload) return
-        const text = elementList.map(e => !e.type || e.type === ElementType.TEXT ? e.value : ZERO)
+        const { TEXT, HYPERLINK } = ElementType
+        const text = elementList.map(e => !e.type || e.type === TEXT || e.type === HYPERLINK ? e.value : ZERO)
           .filter(Boolean)
           .join('')
         const matchStartIndexList = []

@@ -49,6 +49,7 @@ export default class Editor {
       margins: [100, 120, 100, 120],
       tdPadding: 5,
       defaultTdHeight: 40,
+      defaultHyperlinkColor: '#0000FF',
       ...options
     }
     formatElementList(elementList)
