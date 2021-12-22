@@ -438,11 +438,10 @@ export class Draw {
       const ascent = metrics.boundingBoxAscent + rowMargin
       const descent = metrics.boundingBoxDescent + rowMargin
       const height = ascent + descent
-      const rowElement: IRowElement = {
-        ...element,
+      const rowElement: IRowElement = Object.assign(element, {
         metrics,
         style: this._getFont(element, scale)
-      }
+      })
       // 超过限定宽度
       const preElement = elementList[i - 1]
       if (

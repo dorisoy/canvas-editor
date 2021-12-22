@@ -1,5 +1,6 @@
 import './style.css'
 import Editor, { ElementType, IElement, RowFlex } from './editor'
+import { Dialog } from './components/dialog/Dialog'
 
 window.onload = function () {
 
@@ -403,6 +404,39 @@ window.onload = function () {
         imageFileDom.value = ''
       }
     }
+  }
+  const heperlinkDom = document.querySelector<HTMLDivElement>('.menu-item__heperlink')!
+  heperlinkDom.onclick = function () {
+    console.log('heperlink')
+    new Dialog({
+      title: '超链接',
+      data: [{
+        type: 'text',
+        label: '文本',
+        name: 'name',
+        placeholder: '请输入文本'
+      }, {
+        type: 'text',
+        label: '链接',
+        name: 'url',
+        placeholder: '请输入链接'
+      }],
+      onConfirm: (payload) => {
+        const name = payload.find(p => p.name === 'name')?.value
+        if (!name) return
+        const url = payload.find(p => p.name === 'url')?.value
+        if (!url) return
+        instance.command.executeHeperlink({
+          type: ElementType.HYPERLINK,
+          value: '',
+          url,
+          valueList: name.split('').map(n => ({
+            value: n,
+            size: 16
+          }))
+        })
+      }
+    })
   }
   const collspanDom = document.querySelector<HTMLDivElement>('.menu-item__search__collapse')
   const searchInputDom = document.querySelector<HTMLInputElement>('.menu-item__search__collapse__search input')

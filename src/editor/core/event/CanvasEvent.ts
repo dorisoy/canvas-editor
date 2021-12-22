@@ -164,28 +164,26 @@ export class CanvasEvent {
         isComputeRowList: false
       })
     }
+    const elementList = this.draw.getElementList()
+    const positionList = this.position.getPositionList()
+    const curIndex = isTable ? tdValueIndex! : index
+    const curElement = elementList[curIndex]
     // 图片尺寸拖拽组件
     this.imageParticle.clearResizer()
     if (isDirectHitImage) {
-      const elementList = this.draw.getElementList()
-      const positionList = this.position.getPositionList()
-      const curIndex = isTable ? tdValueIndex! : index
-      this.imageParticle.drawResizer(elementList[curIndex], positionList[curIndex])
+      this.imageParticle.drawResizer(curElement, positionList[curIndex])
     }
     // 表格工具组件
     this.tableTool.dispose()
     if (isTable) {
-      const elementList = this.draw.getOriginalElementList()
-      const positionList = this.position.getOriginalPositionList()
-      this.tableTool.render(elementList[index], positionList[index])
+      const originalElementList = this.draw.getOriginalElementList()
+      const originalPositionList = this.position.getOriginalPositionList()
+      this.tableTool.render(originalElementList[index], originalPositionList[index])
     }
     // 超链接
     this.hyperlinkParticle.clearHyperlinkPopup()
-    const elementList = this.draw.getElementList()
-    const positionList = this.position.getPositionList()
-    const curIndex = isTable ? tdValueIndex! : index
-    if (elementList[curIndex].type === ElementType.HYPERLINK) {
-      this.hyperlinkParticle.drawHyperlinkPopup(elementList[curIndex], positionList[curIndex])
+    if (curElement.type === ElementType.HYPERLINK) {
+      this.hyperlinkParticle.drawHyperlinkPopup(curElement, positionList[curIndex])
     }
   }
 
@@ -327,6 +325,7 @@ export class CanvasEvent {
     if (!this.cursor) return
     const cursorPosition = this.position.getCursorPosition()
     if (!data || !cursorPosition || this.isCompositing) return
+    const { TEXT, HYPERLINK } = ElementType
     const text = data.replaceAll(`\n`, ZERO)
     const elementList = this.draw.getElementList()
     const agentDom = this.cursor.getAgentDom()
@@ -342,21 +341,32 @@ export class CanvasEvent {
       restArg = { tdId, trId, tableId }
     }
     const element = elementList[endIndex]
-    const inputData: IElement[] = text.split('').map(value => ({
-      value,
-      type: element.type,
-      font: element.font,
-      size: element.size,
-      bold: element.bold,
-      color: element.color,
-      highlight: element.highlight,
-      italic: element.italic,
-      underline: element.underline,
-      strikeout: element.strikeout,
-      url: element.url,
-      hyperlinkId: element.hyperlinkId,
-      ...restArg
-    }))
+    const inputData: IElement[] = text.split('').map(value => {
+      const newElement: IElement = {
+        value,
+        ...restArg
+      }
+      if (
+        !element.type
+        || element.type === TEXT
+        || (element.type === HYPERLINK && elementList[endIndex + 1]?.type === HYPERLINK)
+      ) {
+        if (element.type) {
+          newElement.type = element.type
+        }
+        newElement.font = element.font
+        newElement.size = element.size
+        newElement.bold = element.bold
+        newElement.color = element.color
+        newElement.highlight = element.highlight
+        newElement.italic = element.italic
+        newElement.underline = element.underline
+        newElement.strikeout = element.strikeout
+        newElement.url = element.url
+        newElement.hyperlinkId = element.hyperlinkId
+      }
+      return newElement
+    })
     let start = 0
     if (isCollspace) {
       start = index + 1

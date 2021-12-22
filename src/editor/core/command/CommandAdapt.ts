@@ -654,6 +654,30 @@ export class CommandAdapt {
     }
   }
 
+  public heperlink(payload: IElement) {
+    const { startIndex, endIndex } = this.range.getRange()
+    if (startIndex === 0 && endIndex === 0) return
+    const elementList = this.draw.getElementList()
+    const { valueList, url } = payload
+    const hyperlinkId = getUUID()
+    const newElementList = valueList?.map<IElement>(v => ({
+      url,
+      hyperlinkId,
+      value: v.value,
+      type: ElementType.HYPERLINK
+    }))
+    if (!newElementList) return
+    const start = startIndex + 1
+    if (startIndex === endIndex) {
+      elementList.splice(start, 0, ...newElementList)
+    } else {
+      elementList.splice(start, endIndex - startIndex, ...newElementList)
+    }
+    const curIndex = start + newElementList.length - 1
+    this.range.setRange(curIndex, curIndex)
+    this.draw.render({ curIndex })
+  }
+
   public image(payload: IDrawImagePayload) {
     const { startIndex, endIndex } = this.range.getRange()
     if (startIndex === 0 && endIndex === 0) return
