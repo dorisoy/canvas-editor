@@ -654,7 +654,7 @@ export class CommandAdapt {
     }
   }
 
-  public heperlink(payload: IElement) {
+  public hyperlink(payload: IElement) {
     const { startIndex, endIndex } = this.range.getRange()
     if (startIndex === 0 && endIndex === 0) return
     const elementList = this.draw.getElementList()

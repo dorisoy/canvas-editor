@@ -357,7 +357,7 @@ ul {
   margin-right: 0;
 }
 
-.menu-item__heperlink i {
+.menu-item__hyperlink i {
   background-image: url('./assets/images/hyperlink.svg');
 }
 

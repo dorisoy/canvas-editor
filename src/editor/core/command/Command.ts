@@ -35,7 +35,7 @@ export class Command {
   private static deleteTableCol: Function
   private static deleteTable: Function
   private static image: Function
-  private static heperlink: Function
+  private static hyperlink: Function
   private static search: Function
   private static print: Function
   private static pageScaleRecovery: Function
@@ -73,7 +73,7 @@ export class Command {
     Command.deleteTableCol = adapt.deleteTableCol.bind(adapt)
     Command.deleteTable = adapt.deleteTable.bind(adapt)
     Command.image = adapt.image.bind(adapt)
-    Command.heperlink = adapt.heperlink.bind(adapt)
+    Command.hyperlink = adapt.hyperlink.bind(adapt)
     Command.search = adapt.search.bind(adapt)
     Command.print = adapt.print.bind(adapt)
     Command.pageScaleRecovery = adapt.pageScaleRecovery.bind(adapt)
@@ -201,8 +201,8 @@ export class Command {
     return Command.deleteTable()
   }
 
-  public executeHeperlink(payload: IElement) {
-    return Command.heperlink(payload)
+  public executeHyperlink(payload: IElement) {
+    return Command.hyperlink(payload)
   }
 
   public executeImage(payload: IDrawImagePayload) {

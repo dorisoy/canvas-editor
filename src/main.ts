@@ -405,9 +405,9 @@ window.onload = function () {
       }
     }
   }
-  const heperlinkDom = document.querySelector<HTMLDivElement>('.menu-item__heperlink')!
-  heperlinkDom.onclick = function () {
-    console.log('heperlink')
+  const hyperlinkDom = document.querySelector<HTMLDivElement>('.menu-item__hyperlink')!
+  hyperlinkDom.onclick = function () {
+    console.log('hyperlink')
     new Dialog({
       title: '超链接',
       data: [{
@@ -426,7 +426,7 @@ window.onload = function () {
         if (!name) return
         const url = payload.find(p => p.name === 'url')?.value
         if (!url) return
-        instance.command.executeHeperlink({
+        instance.command.executeHyperlink({
           type: ElementType.HYPERLINK,
           value: '',
           url,
