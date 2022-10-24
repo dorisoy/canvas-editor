@@ -14,16 +14,28 @@ export class RangeManager {
   private range: IRange
   private listener: Listener
   private historyManager: HistoryManager
+  private container: HTMLDivElement
+  private rangePopupContainer: HTMLDivElement
 
   constructor(draw: Draw) {
     this.draw = draw
     this.options = draw.getOptions()
     this.listener = draw.getListener()
     this.historyManager = draw.getHistoryManager()
+    this.container = draw.getContainer()
+    const { rangePopupContainer } = this._createRangePopupDom()
+    this.rangePopupContainer = rangePopupContainer
     this.range = {
       startIndex: -1,
       endIndex: -1
     }
+  }
+
+  private _createRangePopupDom() {
+    const rangePopupContainer = document.createElement('div')
+    rangePopupContainer.classList.add('range-popup')
+    this.container.append(rangePopupContainer)
+    return { rangePopupContainer }
   }
 
   public getRange(): IRange {
@@ -222,12 +234,32 @@ export class RangeManager {
     }
   }
 
-  public render(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number) {
-    ctx.save()
-    ctx.globalAlpha = this.options.rangeAlpha
-    ctx.fillStyle = this.options.rangeColor
-    ctx.fillRect(x, y, width, height)
-    ctx.restore()
+  public clear(pageNo: number) {
+    if (!this.rangePopupContainer.childNodes.length) return
+    const rangeList = this.rangePopupContainer.querySelectorAll(`[data-pageNo='${pageNo}']`)
+    if (!rangeList.length) return
+    for (let i = rangeList.length - 1; i >= 0; i--) {
+      const rangeElement = rangeList[i]
+      rangeElement.remove()
+    }
+  }
+
+  public render(pageNo: number, x: number, y: number, width: number, height: number) {
+    const rangeElement = document.createElement('div')
+    rangeElement.style.opacity = `${this.options.rangeAlpha}`
+    rangeElement.style.backgroundColor = this.options.rangeColor
+    rangeElement.style.left = `${x}px`
+    let top = y
+    if (pageNo > 0) {
+      const pageGap = this.draw.getPageGap()
+      const pageHeight = this.draw.getHeight()
+      top += pageNo * (pageHeight + pageGap)
+    }
+    rangeElement.style.top = `${top}px`
+    rangeElement.style.width = `${width}px`
+    rangeElement.style.height = `${height}px`
+    rangeElement.setAttribute('data-pageNo', `${pageNo}`)
+    this.rangePopupContainer.append(rangeElement)
   }
 
 }

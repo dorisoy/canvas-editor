@@ -450,3 +450,14 @@
   padding-bottom: 2px;
   color: #0000ff;
 }
+
+.range-popup {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.range-popup>div {
+  pointer-events: none;
+  position: absolute;
+}

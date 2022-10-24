@@ -961,7 +961,7 @@ export class Draw {
       // 绘制选区
       if (rangeRecord.width && rangeRecord.height) {
         const { x, y, width, height } = rangeRecord
-        this.range.render(ctx, x, y, width, height)
+        this.range.render(pageNo, x, y, width, height)
       }
       if (isCrossRowCol && tableRangeElement && tableRangeElement.id === tableId) {
         this.tableParticle.drawRange(ctx, tableRangeElement, x, y)
@@ -972,13 +972,20 @@ export class Draw {
     return { x, y, index }
   }
 
+  private _clearPage(pageNo: number) {
+    const ctx = this.ctxList[pageNo]
+    const pageDom = this.pageList[pageNo]
+    ctx.clearRect(0, 0, pageDom.width, pageDom.height)
+    this.range.clear(pageNo)
+  }
+
   private _drawPage(positionList: IElementPosition[], rowList: IRow[], pageNo: number) {
     const { pageMode } = this.options
     const margins = this.getMargins()
     const innerWidth = this.getInnerWidth()
     const ctx = this.ctxList[pageNo]
-    const pageDom = this.pageList[pageNo]
-    ctx.clearRect(0, 0, pageDom.width, pageDom.height)
+    // 清除上一次渲染页面
+    this._clearPage(pageNo)
     // 绘制背景
     this.background.render(ctx)
     // 绘制页边距
