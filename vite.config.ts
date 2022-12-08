@@ -10,7 +10,10 @@ export default defineConfig(({ mode }) => {
       plugins: [
         cssInjectedByJsPlugin(),
         {
-          ...typescript({ tsconfig: './tsconfig.json' }),
+          ...typescript({ 
+            tsconfig: './tsconfig.json',
+            include:['./src/editor/**'],
+          }),
           apply: 'build',
           declaration: true,
           declarationDir: 'types/',
