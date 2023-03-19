@@ -34,8 +34,7 @@ new Editor(document.querySelector(".canvas-editor"), [
 4. table paging
 
 ## snapshot
-
-![image](https://github.com/Hufe921/canvas-editor/blob/main/src/assets/snapshots/main_v0.9.8.png)
+![image](https://github.com/Hufe921/canvas-editor/blob/feature/header/src/assets/snapshots/header_v0.9.22.png)
 
 ## install
 
